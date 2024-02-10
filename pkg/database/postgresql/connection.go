@@ -6,11 +6,14 @@ import (
 
 	"github.com/charmingruby/make-it-survey/config"
 	_ "github.com/lib/pq"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func ConnectDB(cfg *config.Config) (*sql.DB, error) {
+	// sslmode=require on prod
 	connStr := fmt.Sprintf(
-		"postgres://%s:%s@%s/%s?sslmode=require",
+		"postgres://%s:%s@%s/%s?sslmode=disable",
 		cfg.Database.DatabaseUser,
 		cfg.Database.DatabasePassword,
 		cfg.Database.DatabaseHost,
@@ -23,6 +26,13 @@ func ConnectDB(cfg *config.Config) (*sql.DB, error) {
 	}
 
 	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	if err := runDBMigrations(
+		db,
+		cfg.Database.DatabaseName,
+	); err != nil {
 		return nil, err
 	}
 

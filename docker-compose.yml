@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  server:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret@123
+      - POSTGRES_DB=paygo-pg
+    ports:
+      - "5432:5432"
+    volumes:
+      - make-it-survey-pg:/var/lib/postgresql/data
+
+volumes:
+  make-it-survey-pg:
