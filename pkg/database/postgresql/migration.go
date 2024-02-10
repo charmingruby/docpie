@@ -12,7 +12,7 @@ const migrationURL = "file://./db/migrations"
 func runDBMigrations(conn *sql.DB, databaseName string) error {
 	driver, err := postgres.WithInstance(conn, &postgres.Config{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
@@ -21,12 +21,12 @@ func runDBMigrations(conn *sql.DB, databaseName string) error {
 		driver,
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		panic(err)
+		return err
 	}
 
 	return nil

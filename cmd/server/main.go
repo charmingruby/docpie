@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"os"
 
 	"github.com/charmingruby/make-it-survey/config"
 	"github.com/charmingruby/make-it-survey/pkg/database/postgresql"
@@ -9,17 +9,19 @@ import (
 )
 
 func main() {
+	logger := logger.SetupLogger()
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("Error: %s", err.Error())
+		logger.Error("error loading environment configuration")
+		os.Exit(1)
 	}
+	cfg.AssignLogger(logger)
 
 	db, err := postgresql.ConnectDB(cfg)
 	if err != nil {
-		log.Fatalf("Error: %s", err.Error())
+		logger.Errorf("error connecting to postgres: %s", err.Error())
+		os.Exit(1)
 	}
 	cfg.AssignDatabaseConn(db)
-
-	logger := logger.SetupLogger()
-	cfg.AssignLogger(logger)
 }
