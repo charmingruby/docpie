@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/charmingruby/docpie/config"
+	"github.com/charmingruby/make-it-survey/config"
 	_ "github.com/lib/pq"
 )
 

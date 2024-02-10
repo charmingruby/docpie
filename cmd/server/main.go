@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/charmingruby/docpie/config"
-	"github.com/charmingruby/docpie/pkg/database/postgresql"
-	"github.com/charmingruby/docpie/pkg/logger"
+	"github.com/charmingruby/make-it-survey/config"
+	"github.com/charmingruby/make-it-survey/pkg/database/postgresql"
+	"github.com/charmingruby/make-it-survey/pkg/logger"
 )
 
 func main() {
