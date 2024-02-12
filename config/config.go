@@ -13,25 +13,27 @@ type envConfig struct {
 	DatabasePassword string `env:"DB_PASSWORD,required"`
 	DatabaseHost     string `env:"DB_HOST,required"`
 	DatabaseName     string `env:"DB_NAME,required"`
+	DatabaseSSL      string `env:"DB_SSL,required"`
 	ServerPort       string `env:"SERVER_PORT,required"`
 	ServerHost       string `env:"SERVER_HOST,required"`
 }
 
 type Config struct {
-	Database *databaseConfig
-	Server   *serverConfig
+	Database *DatabaseConfig
+	Server   *ServerConfig
 	Logger   *logrus.Logger
 }
 
-type databaseConfig struct {
+type DatabaseConfig struct {
 	DatabaseUser     string
 	DatabasePassword string
 	DatabaseHost     string
 	DatabaseName     string
+	DatabaseSSL      string
 	DatabaseConn     *sql.DB
 }
 
-type serverConfig struct {
+type ServerConfig struct {
 	Port string
 	Host string
 }
@@ -49,14 +51,15 @@ func LoadConfig() (*Config, error) {
 	}
 
 	cfg := &Config{
-		Database: &databaseConfig{
+		Database: &DatabaseConfig{
 			DatabaseUser:     environment.DatabaseUser,
 			DatabasePassword: environment.DatabasePassword,
 			DatabaseHost:     environment.DatabaseHost,
 			DatabaseName:     environment.DatabaseName,
+			DatabaseSSL:      environment.DatabaseSSL,
 		},
 
-		Server: &serverConfig{
+		Server: &ServerConfig{
 			Port: environment.ServerPort,
 			Host: environment.ServerHost,
 		},

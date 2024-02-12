@@ -10,14 +10,14 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func ConnectDB(cfg *config.Config) (*sql.DB, error) {
-	// sslmode=require on prod
+func LoadDatabase(cfg *config.Config) (*sql.DB, error) {
 	connStr := fmt.Sprintf(
-		"postgres://%s:%s@%s/%s?sslmode=disable",
+		"postgresql://%s:%s@%s/%s?sslmode=%s",
 		cfg.Database.DatabaseUser,
 		cfg.Database.DatabasePassword,
 		cfg.Database.DatabaseHost,
 		cfg.Database.DatabaseName,
+		cfg.Database.DatabaseSSL,
 	)
 
 	db, err := sql.Open("postgres", connStr)
