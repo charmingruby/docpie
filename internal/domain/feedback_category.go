@@ -10,3 +10,11 @@ type FeedbackCategory struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type FeedbackCategoryUseCase interface {
+	FetchFeedbackCategories()
+	GetFeedbackCategory()
+	CreateFeedbackCategory()
+	UpdateFeedbackCategory()
+	DeleteFeedbackCategory()
+}
