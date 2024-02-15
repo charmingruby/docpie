@@ -13,9 +13,9 @@ type Product struct {
 }
 
 type ProductUseCase interface {
-	FetchProducts()
-	GetProduct()
-	CreateProduct()
-	UpdateProduct()
-	DeleteProduct()
+	FetchProducts() ([]Product, error)
+	GetProduct(productID string) (Product, error)
+	CreateProduct(name, description, accountID string) error
+	UploadLogo() error
+	DeleteProduct(productID, accountID string) error
 }

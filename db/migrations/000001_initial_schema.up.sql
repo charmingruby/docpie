@@ -43,9 +43,6 @@ CREATE TABLE IF NOT EXISTS feedback_categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     name varchar NOT NULL,
     description varchar NOT NULL,
-
-    product_id UUID REFERENCES products (id) NOT NULL,
-
     created_at timestamp DEFAULT now() NOT NULL,
     updated_at timestamp DEFAULT now() NOT NULL
 );
@@ -55,6 +52,7 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     rate integer NOT NULL,
     comment text NOT NULL,
 
+    feedback_category_id UUID REFERENCES feedback_categories (id) NOT NULL,
     product_id UUID REFERENCES products (id) NOT NULL,
     account_id UUID REFERENCES accounts (id) NOT NULL,
 

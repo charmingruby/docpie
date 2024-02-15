@@ -12,4 +12,7 @@ type ProductMetrics struct {
 }
 
 type ProductMetricsUseCase interface {
+	GetProductMetrics(productID string) (ProductMetrics, error)
+	CreateProductMetrics(productID string) error
+	UpdateProductMetrics(productID string, totalFeedbacks, amountOfStars uint) error
 }
