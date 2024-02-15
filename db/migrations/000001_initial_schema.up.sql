@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS accounts (
     name varchar NOT NULL,
     last_name varchar NOT NULL,
     email varchar NOT NULL,
-    avatarUrl varchar NOT NULL,
+    role varchar NOT NULL,
+    avatar_url varchar NOT NULL,
     password varchar NOT NULL,
     created_at timestamp DEFAULT now() NOT NULL,
     updated_at timestamp DEFAULT now() NOT NULL   
@@ -19,8 +20,7 @@ CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     name varchar NOT NULL,
     description varchar NOT NULL,
-    tags varchar NOT NULL,
-    logoUrl varchar NOT NULL,
+    logo_url varchar NOT NULL,
 
     account_id UUID REFERENCES accounts (id) NOT NULL,
 
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS feedbacks (
     rate integer NOT NULL,
     comment text NOT NULL,
 
+    product_id UUID REFERENCES products (id) NOT NULL,
     account_id UUID REFERENCES accounts (id) NOT NULL,
-    category_id UUID REFERENCES feedback_categories (id) NOT NULL,
 
     created_at timestamp DEFAULT now() NOT NULL,
     updated_at timestamp DEFAULT now() NOT NULL
