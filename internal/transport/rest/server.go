@@ -14,7 +14,7 @@ type Server struct {
 	Config *config.Config
 }
 
-func NewServer(cfg *config.Config, router *mux.Router) (*Server, error) {
+func NewServer(cfg *config.Config, router *mux.Router, visibleRoutes bool) (*Server, error) {
 	if router == nil {
 		return nil, fmt.Errorf("invalid server router")
 	}
@@ -31,6 +31,17 @@ func NewServer(cfg *config.Config, router *mux.Router) (*Server, error) {
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
+	}
+
+	if visibleRoutes {
+		router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+			t, err := route.GetPathTemplate()
+			if err != nil {
+				return err
+			}
+			fmt.Println(t)
+			return nil
+		})
 	}
 
 	return &Server{

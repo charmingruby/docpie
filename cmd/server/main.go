@@ -33,10 +33,11 @@ func main() {
 	// Initialize services
 
 	// Initialize REST server
-
 	router := mux.NewRouter().StrictSlash(true)
 
-	restServer, err := rest.NewServer(cfg, router)
+	rest.NewPingHandler().Register(router)
+
+	restServer, err := rest.NewServer(cfg, router, true)
 	if err != nil {
 		logger.Errorf("error instantiating server: %s", err.Error())
 		os.Exit(1)
