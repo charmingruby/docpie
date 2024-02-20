@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/charmingruby/make-it-survey/config"
+	"github.com/charmingruby/owler/config"
 	"github.com/gorilla/mux"
 )
 

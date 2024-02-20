@@ -1,4 +1,4 @@
-module github.com/charmingruby/make-it-survey
+module github.com/charmingruby/owler
 
 go 1.18
 

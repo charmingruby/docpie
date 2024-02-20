@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/charmingruby/make-it-survey/config"
-	"github.com/charmingruby/make-it-survey/internal/transport/rest"
-	"github.com/charmingruby/make-it-survey/pkg/database/postgresql"
-	"github.com/charmingruby/make-it-survey/pkg/logger"
+	"github.com/charmingruby/owler/config"
+	"github.com/charmingruby/owler/internal/transport/rest"
+	"github.com/charmingruby/owler/pkg/database/postgresql"
+	"github.com/charmingruby/owler/pkg/logger"
 	"github.com/gorilla/mux"
 )
 

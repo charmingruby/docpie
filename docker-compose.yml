@@ -1,8 +1,8 @@
-version: '3'
+version: "3"
 
 services:
   server:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - make-it-survey-pg:/var/lib/postgresql/data
+      - owler-pg:/var/lib/postgresql/data
 
 volumes:
-  make-it-survey-pg:
+  owler-pg:
