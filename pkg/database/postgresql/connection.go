@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/charmingruby/owler/config"
+	"github.com/charmingruby/upl/config"
 	_ "github.com/lib/pq"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"

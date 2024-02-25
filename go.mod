@@ -1,4 +1,4 @@
-module github.com/charmingruby/owler
+module github.com/charmingruby/upl
 
 go 1.18
 

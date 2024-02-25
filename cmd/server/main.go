@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/charmingruby/owler/config"
-	"github.com/charmingruby/owler/internal/transport/rest"
-	"github.com/charmingruby/owler/pkg/database/postgresql"
-	"github.com/charmingruby/owler/pkg/logger"
+	"github.com/charmingruby/upl/config"
+	"github.com/charmingruby/upl/internal/transport/rest"
+	"github.com/charmingruby/upl/pkg/database/postgresql"
+	"github.com/charmingruby/upl/pkg/logger"
 	"github.com/gorilla/mux"
 )
 

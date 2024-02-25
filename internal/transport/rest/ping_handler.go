@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/charmingruby/owler/internal/transport/rest/endpoints"
+	"github.com/charmingruby/upl/internal/transport/rest/endpoints"
 	"github.com/gorilla/mux"
 )
 

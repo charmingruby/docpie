@@ -23,7 +23,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - owler-pg:/var/lib/postgresql/data
+      - upl-pg:/var/lib/postgresql/data
 
 volumes:
-  owler-pg:
+  upl-pg:

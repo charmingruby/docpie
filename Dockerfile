@@ -5,15 +5,15 @@ WORKDIR /app
 
 COPY . /app/
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o owler ./cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o upl ./cmd/server/main.go
 
 # image step
 FROM scratch
 
 WORKDIR /app
 
-COPY --from=build /app/owler /app/
+COPY --from=build /app/upl /app/
 
 EXPOSE 8000
 
-CMD [ "./owler" ]
+CMD [ "./upl" ]
