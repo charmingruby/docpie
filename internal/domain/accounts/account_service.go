@@ -1,11 +1,28 @@
 package domain
 
-type AuthenticateOutput struct {
-	Token string `json:"token"`
+import (
+	"database/sql"
+)
+
+type AccountService struct {
+	DB                *sql.DB
+	AccountRepository AccountRepository
 }
 
-type AccountUseCase interface {
-	Authenticate(email, password string) (*AuthenticateOutput, error)
-	Register(name, lastName, email, password string) error
-	UploadAvatar() error
+func NewAccountService(DB *sql.DB, accountRepository AccountRepository) *AccountService {
+	svc := &AccountService{DB, accountRepository}
+	return svc
+}
+
+func (a *AccountService) Authenticate(email, password string) (*Account, error) {
+
+	return nil, nil
+}
+
+func (a *AccountService) Register(name, lastName, email, password string) (*Account, error) {
+	return nil, nil
+}
+
+func (a *AccountService) UploadAvatar() (*Account, error) {
+	return nil, nil
 }

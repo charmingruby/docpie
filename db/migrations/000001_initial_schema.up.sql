@@ -68,5 +68,16 @@ CREATE TABLE IF NOT EXISTS uploads (
     deleted_at timestamp
 );
 
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+
+    context varchar NOT NULL,
+    message_id varchar NOT NULL,
+
+    recipient_id UUID REFERENCES accounts (id) NOT NULL,
+
+    sent_at timestamp DEFAULT now() NOT NULL
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS accounts_email_uindex
     ON accounts (email);
