@@ -1,9 +1,8 @@
 package config
 
 import (
-	"database/sql"
-
 	env "github.com/caarlos0/env/v6"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
@@ -30,7 +29,7 @@ type DatabaseConfig struct {
 	DatabaseHost     string
 	DatabaseName     string
 	DatabaseSSL      string
-	DatabaseConn     *sql.DB
+	DatabaseConn     *sqlx.DB
 }
 
 type ServerConfig struct {
@@ -68,7 +67,7 @@ func LoadConfig() (*Config, error) {
 	return cfg, nil
 }
 
-func (cfg *Config) AssignDatabaseConn(db *sql.DB) {
+func (cfg *Config) AssignDatabaseConn(db *sqlx.DB) {
 	cfg.Database.DatabaseConn = db
 }
 

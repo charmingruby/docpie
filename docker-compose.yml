@@ -1,29 +1,16 @@
-version: "3"
+version: '3.7'
 
 services:
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - .:/app-dev
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    depends_on:
-      - postgres
-
   postgres:
-    image: postgres:latest
+    image: bitnami/postgresql:latest
+    ports: 
+      - '5432:5432'
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secret@123
-      - POSTGRES_DB=paygo-pg
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=upl
     volumes:
-      - upl-pg:/var/lib/postgresql/data
+      - upl_pg_data:/bitnami/postgresql
 
 volumes:
-  upl-pg:
+  upl_pg_data:

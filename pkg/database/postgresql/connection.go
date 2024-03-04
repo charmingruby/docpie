@@ -1,16 +1,16 @@
 package postgresql
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/charmingruby/upl/config"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func LoadDatabase(cfg *config.Config) (*sql.DB, error) {
+func LoadDatabase(cfg *config.Config) (*sqlx.DB, error) {
 	connStr := fmt.Sprintf(
 		"postgresql://%s:%s@%s/%s?sslmode=%s",
 		cfg.Database.DatabaseUser,
@@ -20,19 +20,12 @@ func LoadDatabase(cfg *config.Config) (*sql.DB, error) {
 		cfg.Database.DatabaseSSL,
 	)
 
-	db, err := sql.Open("postgres", connStr)
+	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	if err := runDBMigrations(
-		db,
-		cfg.Database.DatabaseName,
-	); err != nil {
 		return nil, err
 	}
 
