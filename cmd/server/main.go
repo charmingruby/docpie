@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/charmingruby/upl/config"
+	"github.com/charmingruby/upl/internal/repository/postgres"
 	"github.com/charmingruby/upl/internal/transport/rest"
 	"github.com/charmingruby/upl/pkg/database/postgresql"
 	"github.com/charmingruby/upl/pkg/logger"
@@ -29,6 +30,7 @@ func main() {
 	cfg.AssignDatabaseConn(db)
 
 	// Initialize repos
+	postgres.NewAccountsRepository(cfg.Logger, cfg.Database.DatabaseConn)
 
 	// Initialize services
 
