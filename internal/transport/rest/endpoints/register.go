@@ -20,7 +20,7 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := &RegisterRequest{}
 		if err := parseRequest[RegisterRequest](request, r.Body); err != nil {
-			payloadError := &validation.HTTPError{
+			payloadError := &validation.EndpointError{
 				Message: validation.NewPayloadErrorResponse([]string{"name", "last_name", "email", "password"}),
 			}
 
@@ -41,6 +41,8 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return
 		}
+
+		logger.Info(fmt.Sprintf("'%s' account created", newAccount.Email))
 
 		sendResponse[any](
 			w,

@@ -23,6 +23,8 @@ func NewAccountHandler(logger *logrus.Logger, accountService *accounts.AccountSe
 
 func (h *AccountHandler) Register(router *mux.Router) {
 	registerEndpoint := endpoints.MakeRegisterEndpoint(h.logger, h.accountService)
+	authenticateEndpoint := endpoints.MakeAuthenticateEndpoint(h.logger, h.accountService)
 
 	router.HandleFunc("/register", registerEndpoint).Methods(http.MethodPost)
+	router.HandleFunc("/authenticate", authenticateEndpoint).Methods(http.MethodPost)
 }

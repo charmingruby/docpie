@@ -11,6 +11,8 @@ func GenerateHash(value string) (string, error) {
 	return string(hash), nil
 }
 
-func VerifyIfHashMatches(hash, value string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(value))
+func VerifyIfHashMatches(hash, value string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(value))
+
+	return err == nil
 }

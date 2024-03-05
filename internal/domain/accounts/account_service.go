@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/pkg/cryptography"
 )
 
 type AccountService struct {
@@ -13,8 +14,26 @@ func NewAccountService(accountRepository AccountRepository) *AccountService {
 	return svc
 }
 
-func (s *AccountService) Authenticate(email, password string) (*Account, error) {
-	return nil, nil
+func (s *AccountService) Authenticate(email, password string) error {
+	account, err := s.AccountRepository.FindByEmail(email)
+	if err != nil {
+		resourceNotFoundError := &validation.ServiceError{
+			Message: validation.NewResourceNotFoundErrorMessage("account"),
+		}
+
+		return resourceNotFoundError
+	}
+
+	isPasswordValid := cryptography.VerifyIfHashMatches(account.Password, password)
+	if !isPasswordValid {
+		credentialsNotMatchError := &validation.ServiceError{
+			Message: validation.NewInvalidCredentialsErrorMessage(),
+		}
+
+		return credentialsNotMatchError
+	}
+
+	return nil
 }
 
 func (s *AccountService) Register(account *Account) error {
