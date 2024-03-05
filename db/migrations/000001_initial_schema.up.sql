@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS collection_members (
     collection_id UUID REFERENCES collections (id) NOT NULL,
     
     joined_at timestamp DEFAULT now() NOT NULL,
+    left_at timestamp,
     updated_at timestamp DEFAULT now() NOT NULL   
 );
 
@@ -55,10 +56,11 @@ CREATE TABLE IF NOT EXISTS uploads (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     
     name varchar NOT NULL,
+    url varchar NOT NULL,
 
     file_name varchar NOT NULL,
     file_size varchar NOT NULL,
-    file_extension varchar NOT NULL,
+    file_mimetype varchar NOT NULL,
 
     collection_id UUID REFERENCES collections (id) NOT NULL,
     uploader_id UUID REFERENCES accounts (id) NOT NULL,

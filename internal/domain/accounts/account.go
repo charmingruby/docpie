@@ -1,7 +1,6 @@
-package domain
+package accounts
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/charmingruby/upl/internal/core"
@@ -113,10 +112,6 @@ func (a *Account) Validate() error {
 }
 
 func (a *Account) encryptPassword() error {
-	fmt.Println()
-	fmt.Printf("password length: %d", len(a.Password))
-	fmt.Println()
-
 	if validation.IsEmpty(a.Password) {
 		return &validation.ValidationError{
 			Message: validation.NewRequiredFieldErrorMessage("password"),

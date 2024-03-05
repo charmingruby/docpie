@@ -1,4 +1,4 @@
-package domain
+package accounts
 
 import (
 	"encoding/json"

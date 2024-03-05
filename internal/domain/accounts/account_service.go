@@ -1,4 +1,4 @@
-package domain
+package accounts
 
 type AccountService struct {
 	AccountRepository AccountRepository
