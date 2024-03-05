@@ -13,11 +13,7 @@ func (s *AccountService) Authenticate(email, password string) (*Account, error) 
 	return nil, nil
 }
 
-func (s *AccountService) Register(name, lastName, email, password string) error {
-	account, err := NewAccount(name, lastName, email, password)
-	if err != nil {
-		return err
-	}
+func (s *AccountService) Register(account *Account) error {
 
 	if err := s.AccountRepository.Create(account); err != nil {
 		return err
