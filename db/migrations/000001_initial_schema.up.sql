@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     name varchar NOT NULL,
     last_name varchar NOT NULL,
     email varchar NOT NULL,
-    avatar_url varchar NOT NULL,
+    avatar_url varchar,
     role varchar NOT NULL,
     password varchar NOT NULL,
 

@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	domain "github.com/charmingruby/upl/internal/domain/accounts"
+	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -9,11 +9,13 @@ import (
 
 const (
 	createAccount = "create account"
+	findByEmail   = "find by email"
 )
 
 func accountQueries() map[string]string {
 	return map[string]string{
-		createAccount: `INSERT INTO accounts (name, last_name, email, password) VALUES($1, $2, $3, $4) RETURNING *`,
+		createAccount: `INSERT INTO accounts (name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`,
+		findByEmail:   `SELECT * FROM accounts WHERE email = $1`,
 	}
 }
 
@@ -59,17 +61,33 @@ func (r *AccountsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	return stmt, nil
 }
 
-func (r *AccountsRepository) Create(account *domain.Account) error {
+func (r *AccountsRepository) Create(account *accounts.Account) error {
 	stmt, err := r.statement(createAccount)
 	if err != nil {
 		return err
 	}
-
-	if err := stmt.Get(account.Name, account.LastName, account.Email, account.Password); err != nil {
+	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL)
+	if err != nil {
 		return &validation.StorageError{
-			Message: validation.NewQueryError("account", "creating", err),
+			Message: validation.NewQueryErrorMessage("account", "creating", err),
 		}
 	}
 
 	return nil
+}
+
+func (r *AccountsRepository) FindByEmail(email string) (*accounts.Account, error) {
+	stmt, err := r.statement(findByEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	account := accounts.Account{}
+	if err = stmt.Get(&account, email); err != nil {
+		return nil, &validation.StorageError{
+			Message: validation.NewResourceNotFoundByErrorMessage(email, "account", "email"),
+		}
+	}
+
+	return &account, nil
 }

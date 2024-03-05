@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 )
@@ -43,4 +44,12 @@ func writeResponse(rw http.ResponseWriter, r *Response) {
 		http.Error(rw, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func parseRequest[T any](r *T, body io.ReadCloser) error {
+	if err := json.NewDecoder(body).Decode(&r); err != nil {
+		return err
+	}
+
+	return nil
 }

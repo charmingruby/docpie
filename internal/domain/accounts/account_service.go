@@ -1,5 +1,9 @@
 package accounts
 
+import (
+	"github.com/charmingruby/upl/internal/validation"
+)
+
 type AccountService struct {
 	AccountRepository AccountRepository
 }
@@ -14,6 +18,12 @@ func (s *AccountService) Authenticate(email, password string) (*Account, error) 
 }
 
 func (s *AccountService) Register(account *Account) error {
+	emailAvailable, _ := s.AccountRepository.FindByEmail(account.Email)
+	if emailAvailable != nil {
+		return &validation.ServiceError{
+			Message: validation.NewUniqueValidationErrorMessage(account.Email),
+		}
+	}
 
 	if err := s.AccountRepository.Create(account); err != nil {
 		return err

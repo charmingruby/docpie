@@ -18,6 +18,10 @@ func NewQueryStatementPreparationErrorMessage(query string) string {
 	return fmt.Sprintf("prepared statement '%s' not found", query)
 }
 
-func NewQueryError(entity, action string, err error) string {
+func NewQueryErrorMessage(entity, action string, err error) string {
 	return fmt.Sprintf("error %s %s: %v", action, entity, err)
+}
+
+func NewResourceNotFoundByErrorMessage(identifier string, entity, field string) string {
+	return fmt.Sprintf("error finding %s with %s '%s'", entity, field, identifier)
 }

@@ -36,15 +36,15 @@ func NewAccount(name, lastName, email, password string) (*Account, error) {
 }
 
 type Account struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	Role      string    `json:"role"`
-	AvatarURL string    `json:"avatar_url"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string    `db:"id" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	LastName  string    `db:"last_name" json:"last_name"`
+	Email     string    `db:"email" json:"email"`
+	Role      string    `db:"role" json:"role"`
+	AvatarURL string    `db:"avatar_url" json:"avatar_url"`
+	Password  string    `db:"password" json:"password"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
 func (a *Account) Validate() error {
