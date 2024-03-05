@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/charmingruby/upl/internal/core"
@@ -80,7 +81,7 @@ func (a *Account) Validate() error {
 
 	if validation.IsGreater(a.LastName, 32) {
 		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("last name", 32, true),
+			Message: validation.NewFieldLengthErrorMessage("last name", 32, false),
 		}
 	}
 
@@ -98,7 +99,7 @@ func (a *Account) Validate() error {
 
 	if validation.IsGreater(a.Email, 64) {
 		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("email", 64, true),
+			Message: validation.NewFieldLengthErrorMessage("email", 64, false),
 		}
 	}
 
@@ -112,13 +113,17 @@ func (a *Account) Validate() error {
 }
 
 func (a *Account) encryptPassword() error {
+	fmt.Println()
+	fmt.Printf("password length: %d", len(a.Password))
+	fmt.Println()
+
 	if validation.IsEmpty(a.Password) {
 		return &validation.ValidationError{
 			Message: validation.NewRequiredFieldErrorMessage("password"),
 		}
 	}
 
-	if validation.IsLower(a.Password, 3) {
+	if validation.IsLower(a.Password, 8) {
 		return &validation.ValidationError{
 			Message: validation.NewFieldLengthErrorMessage("password", 8, true),
 		}
@@ -126,7 +131,7 @@ func (a *Account) encryptPassword() error {
 
 	if validation.IsGreater(a.Password, 16) {
 		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("password", 16, true),
+			Message: validation.NewFieldLengthErrorMessage("password", 16, false),
 		}
 	}
 

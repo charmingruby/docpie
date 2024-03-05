@@ -29,3 +29,10 @@ new-mig:
 .PHONY: run
 run:
 	go run ./cmd/server/main.go
+
+#############
+# TESTS     #
+#############
+.PHONY: test
+test:
+	go test ./...

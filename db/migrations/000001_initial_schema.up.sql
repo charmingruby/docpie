@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS collections (
     tag_id UUID REFERENCES collection_tags (id) NOT NULL,
     creator_id UUID REFERENCES accounts (id) NOT NULL,
 
-    latest_activity timestamp DEFAULT now() NOT NULL,
     created_at timestamp DEFAULT now() NOT NULL,
     updated_at timestamp DEFAULT now() NOT NULL
 );

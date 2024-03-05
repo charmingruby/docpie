@@ -1,10 +1,10 @@
-DROP INDEX IF EXISTS subscribers_email_uindex;
-DROP INDEX IF EXISTS accounts_email_uindex;
 
-DROP TABLE IF EXISTS subscribers;
+DROP TABLE IF EXISTS collection_members;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS uploads;
+DROP TABLE IF EXISTS collections;
+DROP TABLE IF EXISTS collection_tags;
 DROP TABLE IF EXISTS accounts;
-DROP TABLE IF EXISTS mailing_lists;
-DROP TABLE IF EXISTS newsletters;
-DROP TABLE IF EXISTS newsletters_tags;
 
+DROP INDEX IF EXISTS accounts_email_uindex;
 DROP EXTENSION IF EXISTS "uuid-ossp";
