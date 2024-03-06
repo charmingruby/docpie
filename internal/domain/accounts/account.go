@@ -10,7 +10,7 @@ import (
 
 const (
 	managerRole = "manager"
-	defaultRole = "user"
+	defaultRole = "member"
 )
 
 func NewAccount(name, lastName, email, password string) (*Account, error) {

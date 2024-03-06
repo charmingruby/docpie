@@ -51,6 +51,10 @@ func (s *AccountService) Register(account *Account) error {
 	return nil
 }
 
+func (s *AccountService) UpgradeAnAccountToAManager() error {
+	return nil
+}
+
 func (s *AccountService) UploadAvatar() (*Account, error) {
 	return nil, nil
 }
