@@ -14,14 +14,14 @@ func NewAccountService(accountRepository AccountRepository) *AccountService {
 	return svc
 }
 
-func (s *AccountService) Authenticate(email, password string) error {
+func (s *AccountService) Authenticate(email, password string) (*Account, error) {
 	account, err := s.AccountRepository.FindByEmail(email)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
 		}
 
-		return resourceNotFoundError
+		return nil, resourceNotFoundError
 	}
 
 	isPasswordValid := cryptography.VerifyIfHashMatches(account.Password, password)
@@ -30,10 +30,10 @@ func (s *AccountService) Authenticate(email, password string) error {
 			Message: validation.NewInvalidCredentialsErrorMessage(),
 		}
 
-		return credentialsNotMatchError
+		return nil, credentialsNotMatchError
 	}
 
-	return nil
+	return account, nil
 }
 
 func (s *AccountService) Register(account *Account) error {

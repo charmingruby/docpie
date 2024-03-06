@@ -15,6 +15,7 @@ type envConfig struct {
 	DatabaseSSL      string `env:"DB_SSL,required"`
 	ServerPort       string `env:"SERVER_PORT,required"`
 	ServerHost       string `env:"SERVER_HOST,required"`
+	JwtSecretKey     string `env:"JWT_SECRET_KEY,required"`
 }
 
 type Config struct {

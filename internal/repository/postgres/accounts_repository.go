@@ -14,7 +14,7 @@ const (
 
 func accountQueries() map[string]string {
 	return map[string]string{
-		createAccount: `INSERT INTO accounts (name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`,
+		createAccount: `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
 		findByEmail:   `SELECT * FROM accounts WHERE email = $1`,
 	}
 }
@@ -66,7 +66,7 @@ func (r *AccountsRepository) Create(account *accounts.Account) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL)
+	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL)
 	if err != nil {
 		return &validation.StorageError{
 			Message: validation.NewQueryErrorMessage("account", "creating", err),

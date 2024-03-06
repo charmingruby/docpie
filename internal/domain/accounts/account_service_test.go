@@ -35,12 +35,13 @@ func (m *MockAccountRepository) FindByEmail(email string) (*Account, error) {
 	return nil, args.Error(1)
 }
 
-func TestCreateCategory(t *testing.T) {
+func TestCreateAccount(t *testing.T) {
 	repo := new(MockAccountRepository)
 	service := NewAccountService(repo)
 
 	acc := makeAccount()
 
+	repo.On("FindByEmail", acc.Email).Return(nil, nil)
 	repo.On("Create", acc).Return(nil)
 
 	err := service.Register(acc)

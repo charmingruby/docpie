@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
     
     name varchar NOT NULL,
     last_name varchar NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 );
 
 CREATE TABLE IF NOT EXISTS collection_tags (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
 
     name varchar NOT NULL,
     description varchar NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS collection_tags (
 );
 
 CREATE TABLE IF NOT EXISTS collections (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
     
     name varchar NOT NULL,
     description varchar NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS collections (
 );
 
 CREATE TABLE IF NOT EXISTS collection_members (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
 
     account_id UUID REFERENCES accounts (id) NOT NULL,
     collection_id UUID REFERENCES collections (id) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS collection_members (
 );
 
 CREATE TABLE IF NOT EXISTS uploads (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
     
     name varchar NOT NULL,
     url varchar NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS uploads (
 );
 
 CREATE TABLE IF NOT EXISTS notifications (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
 
     context varchar NOT NULL,
     message_id varchar NOT NULL,

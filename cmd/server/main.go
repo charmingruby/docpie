@@ -18,7 +18,7 @@ func main() {
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		logger.Error("error loading environment configuration")
+		logger.Error(err.Error())
 		os.Exit(1)
 	}
 	cfg.AssignLogger(logger)

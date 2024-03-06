@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/pkg/token"
 	"github.com/sirupsen/logrus"
 )
 
@@ -54,14 +55,27 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 			return
 		}
 
-		err := accountsService.Authenticate(request.Email, request.Password)
+		account, err := accountsService.Authenticate(request.Email, request.Password)
+		if err != nil {
+			logger.Error(err)
+			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+		logger.Info(fmt.Sprintf("'%s' validated successfully credentials", request.Email))
+
+		t, err := token.NewJwtService().GenerateToken(account.ID, account.Role)
 		if err != nil {
 			logger.Error(err)
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return
 		}
 
-		logger.Info(fmt.Sprintf("'%s' validated successfully credentials", request.Email))
+		body := &AuthenticateResponse{
+			Token: t,
+		}
 
+		logger.Info(fmt.Sprintf("'%s' authenticated successfully", request.Email))
+
+		sendResponse[AuthenticateResponse](w, "Authenticated successfully.", http.StatusOK, body)
 	}
 }
