@@ -24,7 +24,7 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 		request := &AuthenticateRequest{}
 		if err := parseRequest[AuthenticateRequest](request, r.Body); err != nil {
 			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorResponse([]string{"email", "password"}),
+				Message: validation.NewPayloadErrorMessage([]string{"email", "password"}),
 			}
 
 			logger.Error(payloadError)
@@ -57,6 +57,13 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 
 		account, err := accountsService.Authenticate(request.Email, request.Password)
 		if err != nil {
+			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
+			if ok {
+				logger.Error(resourceNotFoundError)
+				sendResponse[any](w, resourceNotFoundError.Error(), http.StatusNotFound, nil)
+				return
+			}
+
 			logger.Error(err)
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return

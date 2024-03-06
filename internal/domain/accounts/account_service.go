@@ -17,7 +17,7 @@ func NewAccountService(accountRepository AccountRepository) *AccountService {
 func (s *AccountService) Authenticate(email, password string) (*Account, error) {
 	account, err := s.AccountRepository.FindByEmail(email)
 	if err != nil {
-		resourceNotFoundError := &validation.ServiceError{
+		resourceNotFoundError := &validation.ResourceNotFoundError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
 		}
 
@@ -51,8 +51,36 @@ func (s *AccountService) Register(account *Account) error {
 	return nil
 }
 
-func (s *AccountService) UpgradeAnAccountToAManager() error {
-	return nil
+func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, error) {
+	account, err := s.AccountRepository.FindById(accountID)
+	if err != nil {
+		resourceNotFoundError := &validation.ServiceError{
+			Message: validation.NewResourceNotFoundErrorMessage("account"),
+		}
+
+		return "", resourceNotFoundError
+	}
+
+	namedRole, err := account.isRoleValid(role)
+	if err != nil {
+		return "", err
+	}
+
+	if account.Role == namedRole {
+		notModifiedError := &validation.NotModifiedError{
+			Message: validation.NewNotModifiedErrorMessage(account.ID, namedRole),
+		}
+
+		return "", notModifiedError
+	}
+
+	account.Role = namedRole
+
+	if err := s.AccountRepository.Save(account); err != nil {
+		return "", err
+	}
+
+	return account.Role, nil
 }
 
 func (s *AccountService) UploadAvatar() (*Account, error) {

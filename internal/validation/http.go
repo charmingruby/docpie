@@ -1,6 +1,10 @@
 package validation
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/charmingruby/upl/helpers"
+)
 
 type EndpointError struct {
 	Message string `json:"message"`
@@ -10,22 +14,24 @@ func (e *EndpointError) Error() string {
 	return e.Message
 }
 
-func NewPayloadErrorResponse(requiredFields []string) string {
+func NewPayloadErrorMessage(requiredFields []string) string {
 	var fieldsStr string
 
 	for idx, field := range requiredFields {
-		if idx+1 == len(requiredFields) {
-			fieldsStr += fmt.Sprintf(" and %s", field)
+		if idx == 0 {
+			fieldsStr += field
 		} else {
-			if idx == 0 {
-				fieldsStr += field
+			if idx+1 == len(requiredFields) {
+				fieldsStr += fmt.Sprintf(" and %s", field)
 			} else {
 				fieldsStr += fmt.Sprintf(", %s", field)
 			}
 		}
 	}
 
-	return fmt.Sprintf("Invalid payload, %s are required.", fieldsStr)
+	statementConnector := helpers.If[string](len(requiredFields) <= 1, "is", "are")
+
+	return fmt.Sprintf("Invalid payload, %s %s required.", fieldsStr, statementConnector)
 }
 
 func NewEmptyPayloadFieldsErrorMessage(fields []string) string {

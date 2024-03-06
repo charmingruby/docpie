@@ -8,14 +8,18 @@ import (
 )
 
 const (
-	createAccount = "create account"
-	findByEmail   = "find by email"
+	createAccount      = "create account"
+	findAccountByEmail = "find by email"
+	findAccountById    = "find by id"
+	saveAccount        = "save account"
 )
 
 func accountQueries() map[string]string {
 	return map[string]string{
-		createAccount: `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-		findByEmail:   `SELECT * FROM accounts WHERE email = $1`,
+		createAccount:      `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+		findAccountByEmail: `SELECT * FROM accounts WHERE email = $1`,
+		findAccountById:    `SELECT * FROM accounts WHERE id = $1`,
+		saveAccount:        `UPDATE accounts SET name = $1, last_name = $2, email = $3, role = $4, avatar_url = $5 where id = $6`,
 	}
 }
 
@@ -77,7 +81,7 @@ func (r *AccountsRepository) Create(account *accounts.Account) error {
 }
 
 func (r *AccountsRepository) FindByEmail(email string) (*accounts.Account, error) {
-	stmt, err := r.statement(findByEmail)
+	stmt, err := r.statement(findAccountByEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -90,4 +94,36 @@ func (r *AccountsRepository) FindByEmail(email string) (*accounts.Account, error
 	}
 
 	return &account, nil
+}
+
+func (r *AccountsRepository) FindById(id string) (*accounts.Account, error) {
+	stmt, err := r.statement(findAccountById)
+	if err != nil {
+		return nil, err
+	}
+
+	account := accounts.Account{}
+	if err := stmt.Get(&account, id); err != nil {
+		return nil, &validation.StorageError{
+			Message: validation.NewResourceNotFoundByErrorMessage(id, "account", "id"),
+		}
+	}
+
+	return &account, nil
+}
+
+func (r *AccountsRepository) Save(account *accounts.Account) error {
+	stmt, err := r.statement(saveAccount)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.AvatarURL, account.ID)
+	if err != nil {
+		return &validation.StorageError{
+			Message: validation.NewQueryErrorMessage("account", "creating", err),
+		}
+	}
+
+	return nil
 }

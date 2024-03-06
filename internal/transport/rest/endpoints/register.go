@@ -21,7 +21,7 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 		request := &RegisterRequest{}
 		if err := parseRequest[RegisterRequest](request, r.Body); err != nil {
 			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorResponse([]string{"name", "last_name", "email", "password"}),
+				Message: validation.NewPayloadErrorMessage([]string{"name", "last_name", "email", "password"}),
 			}
 
 			logger.Error(payloadError.Error())

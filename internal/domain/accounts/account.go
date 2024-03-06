@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/charmingruby/upl/internal/core"
@@ -10,7 +11,7 @@ import (
 
 const (
 	managerRole = "manager"
-	defaultRole = "member"
+	defaultRole = "default"
 )
 
 func NewAccount(name, lastName, email, password string) (*Account, error) {
@@ -19,10 +20,11 @@ func NewAccount(name, lastName, email, password string) (*Account, error) {
 		Name:      name,
 		LastName:  lastName,
 		Email:     email,
-		Role:      defaultRole,
 		AvatarURL: "",
 		Password:  password,
 	}
+
+	a.Role = a.accountRoles()[defaultRole]
 
 	if err := a.Validate(); err != nil {
 		return nil, err
@@ -109,6 +111,23 @@ func (a *Account) Validate() error {
 	}
 
 	return nil
+}
+
+func (a *Account) accountRoles() map[string]string {
+	return map[string]string{
+		managerRole: "manager",
+		defaultRole: "member",
+	}
+}
+
+func (a *Account) isRoleValid(role string) (string, error) {
+	namedRole, ok := a.accountRoles()[role]
+
+	if !ok {
+		return "nil", fmt.Errorf("invalid role '%s'", role)
+	}
+
+	return namedRole, nil
 }
 
 func (a *Account) encryptPassword() error {
