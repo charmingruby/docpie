@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"net/http"
+
 	"github.com/charmingruby/upl/internal/transport/rest/endpoints"
 	"github.com/gorilla/mux"
 )
@@ -14,5 +16,5 @@ func NewPingHandler() *PingHandler {
 func (h *PingHandler) Register(router *mux.Router) {
 	pingEndpoint := endpoints.MakePingEndpoint()
 
-	router.HandleFunc("/ping", pingEndpoint)
+	router.HandleFunc("/ping", pingEndpoint).Methods(http.MethodGet)
 }

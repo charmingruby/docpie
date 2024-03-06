@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Response struct {
@@ -43,4 +44,16 @@ func sendResponse[T any](rw http.ResponseWriter, message string, code int, body 
 	}
 
 	writeResponse(rw, response)
+}
+
+func extractTokenFromRequest(req *http.Request) string {
+	token := req.Header.Get("Authorization")
+
+	splittedToken := strings.Split(token, " ")
+
+	if len(splittedToken) == 2 {
+		return splittedToken[1]
+	}
+
+	return ""
 }
