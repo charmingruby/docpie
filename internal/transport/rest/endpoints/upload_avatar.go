@@ -59,14 +59,14 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 
 		// Register file on Bucket
 		cl := cloudflare.New(logger)
-		if err = cl.Upload(file, fileURL); err != nil {
+		if err = cl.UploadToBucket(file, fileURL); err != nil {
 			logger.Error(err)
 		}
 
 		// Update account
 		if err := accountsService.UploadAvatar(payload.AccountID, fileURL); err != nil {
 			// Remove file from Bucket
-			if err := cl.Remotion(fileURL); err != nil {
+			if err := cl.RemoveFromBucket(fileURL); err != nil {
 				logger.Error(err.Error())
 				sendResponse[any](w, err.Error(), http.StatusInternalServerError, nil)
 				return

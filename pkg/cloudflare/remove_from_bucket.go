@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func (c *Cloudflare) Remotion(key string) error {
+func (c *Cloudflare) RemoveFromBucket(key string) error {
 	c.logger.Info("Removing a file from Cloudflare...")
 
 	_, err := c.client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
