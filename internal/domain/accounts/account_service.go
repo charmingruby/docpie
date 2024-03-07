@@ -83,6 +83,21 @@ func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, er
 	return account.Role, nil
 }
 
-func (s *AccountService) UploadAvatar() (*Account, error) {
-	return nil, nil
+func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
+	account, err := s.AccountRepository.FindById(accountID)
+	if err != nil {
+		resourceNotFoundError := &validation.ServiceError{
+			Message: validation.NewResourceNotFoundErrorMessage("account"),
+		}
+
+		return resourceNotFoundError
+	}
+
+	account.AvatarURL = fileURL
+
+	if err := s.AccountRepository.Save(account); err != nil {
+		return err
+	}
+
+	return nil
 }

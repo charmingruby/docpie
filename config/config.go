@@ -8,14 +8,18 @@ import (
 )
 
 type envConfig struct {
-	DatabaseUser     string `env:"DB_USER,required"`
-	DatabasePassword string `env:"DB_PASSWORD,required"`
-	DatabaseHost     string `env:"DB_HOST,required"`
-	DatabaseName     string `env:"DB_NAME,required"`
-	DatabaseSSL      string `env:"DB_SSL,required"`
-	ServerPort       string `env:"SERVER_PORT,required"`
-	ServerHost       string `env:"SERVER_HOST,required"`
-	JwtSecretKey     string `env:"JWT_SECRET_KEY,required"`
+	DatabaseUser        string `env:"DB_USER,required"`
+	DatabasePassword    string `env:"DB_PASSWORD,required"`
+	DatabaseHost        string `env:"DB_HOST,required"`
+	DatabaseName        string `env:"DB_NAME,required"`
+	DatabaseSSL         string `env:"DB_SSL,required"`
+	ServerPort          string `env:"SERVER_PORT,required"`
+	ServerHost          string `env:"SERVER_HOST,required"`
+	JwtSecretKey        string `env:"JWT_SECRET_KEY,required"`
+	CloudflareAccountID string `env:"CLOUDFLARE_ACCOUNT_ID,required"`
+	AwsBucketName       string `env:"AWS_BUCKET_NAME,required"`
+	AwsAccessKeyID      string `env:"AWS_ACCESS_KEY_ID,required"`
+	AwsSecretAccessKey  string `env:"AWS_SECRET_ACCESS_KEY,required"`
 }
 
 type Config struct {

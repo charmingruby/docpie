@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Response struct {
@@ -52,4 +53,16 @@ func parseRequest[T any](r *T, body io.ReadCloser) error {
 	}
 
 	return nil
+}
+
+func extractTokenFromRequest(req *http.Request) string {
+	token := req.Header.Get("Authorization")
+
+	splittedToken := strings.Split(token, " ")
+
+	if len(splittedToken) == 2 {
+		return splittedToken[1]
+	}
+
+	return ""
 }

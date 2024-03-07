@@ -26,8 +26,10 @@ func (h *AccountHandler) Register(router *mux.Router) {
 	registerEndpoint := endpoints.MakeRegisterEndpoint(h.logger, h.accountService)
 	authenticateEndpoint := endpoints.MakeAuthenticateEndpoint(h.logger, h.accountService)
 	updateAnAccountRole := endpoints.MakeUpdateAnAccountRole(h.logger, h.accountService)
+	uploadAvatar := endpoints.MakeUploadAvatar(h.logger, h.accountService)
 
 	router.HandleFunc("/register", registerEndpoint).Methods(http.MethodPost)
 	router.HandleFunc("/authenticate", authenticateEndpoint).Methods(http.MethodPost)
 	router.HandleFunc("/accounts/{id}/roles", middlewares.ProtectedRouteByRole(h.logger, "manager", updateAnAccountRole)).Methods(http.MethodPatch)
+	router.HandleFunc("/me/avatar", middlewares.ProtectedRoute(h.logger, uploadAvatar)).Methods(http.MethodPatch)
 }
