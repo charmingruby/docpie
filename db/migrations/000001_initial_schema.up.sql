@@ -9,9 +9,13 @@ CREATE TABLE IF NOT EXISTS accounts (
     avatar_url varchar,
     role varchar NOT NULL,
     password varchar NOT NULL,
+    upload_quantity integer NOT NULL,
+
+    deleted_by UUID REFERENCES accounts (id),
 
     created_at timestamp DEFAULT now() NOT NULL,
-    updated_at timestamp DEFAULT now() NOT NULL   
+    updated_at timestamp,
+    deleted_at timestamp
 );
 
 CREATE TABLE IF NOT EXISTS collection_tags (
@@ -46,7 +50,8 @@ CREATE TABLE IF NOT EXISTS collection_members (
 
     account_id UUID REFERENCES accounts (id) NOT NULL,
     collection_id UUID REFERENCES collections (id) NOT NULL,
-    
+    upload_quantity integer NOT NULL,
+
     joined_at timestamp DEFAULT now() NOT NULL,
     left_at timestamp,
     updated_at timestamp DEFAULT now() NOT NULL   
@@ -64,7 +69,7 @@ CREATE TABLE IF NOT EXISTS uploads (
 
     collection_id UUID REFERENCES collections (id) NOT NULL,
     uploader_id UUID REFERENCES accounts (id) NOT NULL,
-
+    
     uploaded_at timestamp DEFAULT now() NOT NULL,
     deleted_at timestamp
 );

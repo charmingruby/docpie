@@ -16,10 +16,10 @@ const (
 
 func accountQueries() map[string]string {
 	return map[string]string{
-		createAccount:      `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+		createAccount:      `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url, upload_quantity) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
 		findAccountByEmail: `SELECT * FROM accounts WHERE email = $1`,
 		findAccountById:    `SELECT * FROM accounts WHERE id = $1`,
-		saveAccount:        `UPDATE accounts SET name = $1, last_name = $2, email = $3, role = $4, avatar_url = $5 where id = $6`,
+		saveAccount:        `UPDATE accounts SET name = $1, last_name = $2, email = $3, role = $4, avatar_url = $5, updated_at = $6, deleted_by = $7, deleted_at = $8, upload_quantity = $9 where id = $10`,
 	}
 }
 
@@ -70,7 +70,7 @@ func (r *AccountsRepository) Create(account *accounts.Account) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL)
+	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL, account.UploadQuantity)
 	if err != nil {
 		return &validation.StorageError{
 			Message: validation.NewQueryErrorMessage("account", "creating", err),
@@ -118,7 +118,7 @@ func (r *AccountsRepository) Save(account *accounts.Account) error {
 		return err
 	}
 
-	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.AvatarURL, account.ID)
+	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.AvatarURL, account.UpdatedAt, account.DeletedBy, account.DeletedAt, account.UploadQuantity, account.ID)
 	if err != nil {
 		return &validation.StorageError{
 			Message: validation.NewQueryErrorMessage("account", "creating", err),

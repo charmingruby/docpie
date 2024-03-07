@@ -1,6 +1,8 @@
 package accounts
 
 import (
+	"time"
+
 	"github.com/charmingruby/upl/internal/validation"
 	"github.com/charmingruby/upl/pkg/cryptography"
 )
@@ -75,6 +77,7 @@ func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, er
 	}
 
 	account.Role = namedRole
+	account.Touch()
 
 	if err := s.AccountRepository.Save(account); err != nil {
 		return "", err
@@ -93,7 +96,30 @@ func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 		return resourceNotFoundError
 	}
 
-	account.AvatarURL = fileURL
+	account.AvatarURL = &fileURL
+	account.Touch()
+
+	if err := s.AccountRepository.Save(account); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *AccountService) DeleteAnAccount(accountID, managerID string) error {
+	account, err := s.AccountRepository.FindById(accountID)
+	if err != nil {
+		resourceNotFoundError := &validation.ServiceError{
+			Message: validation.NewResourceNotFoundErrorMessage("account"),
+		}
+
+		return resourceNotFoundError
+	}
+
+	account.Touch()
+	account.DeletedBy = &managerID
+	now := time.Now()
+	account.DeletedAt = &now
 
 	if err := s.AccountRepository.Save(account); err != nil {
 		return err

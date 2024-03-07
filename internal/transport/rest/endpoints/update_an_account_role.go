@@ -16,8 +16,8 @@ type MakeUpdateAnAccountRoleRequest struct {
 
 func MakeUpdateAnAccountRole(logger *logrus.Logger, accountsService *accounts.AccountService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		accountToUpdateId := vars["id"]
+		params := mux.Vars(r)
+		accountToUpdateID := params["id"]
 
 		request := &MakeUpdateAnAccountRoleRequest{}
 		if err := parseRequest[MakeUpdateAnAccountRoleRequest](request, r.Body); err != nil {
@@ -27,11 +27,11 @@ func MakeUpdateAnAccountRole(logger *logrus.Logger, accountsService *accounts.Ac
 			return
 		}
 
-		namedRole, err := accountsService.UpdateAnAccountRole(accountToUpdateId, request.Role)
+		namedRole, err := accountsService.UpdateAnAccountRole(accountToUpdateID, request.Role)
 		if err != nil {
 			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
 			if ok {
-				logger.Error(resourceNotFoundError)
+				logger.Error(resourceNotFoundError.Error())
 				sendResponse[any](w, resourceNotFoundError.Error(), http.StatusNotFound, nil)
 				return
 			}
@@ -44,13 +44,13 @@ func MakeUpdateAnAccountRole(logger *logrus.Logger, accountsService *accounts.Ac
 				return
 			}
 
-			logger.Error(err)
+			logger.Error(err.Error())
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return
 		}
 
-		msg := fmt.Sprintf("'%s' is now: '%s'", accountToUpdateId, namedRole)
-		logger.Error(msg)
+		msg := fmt.Sprintf("'%s' is now: '%s'", accountToUpdateID, namedRole)
+		logger.Info(msg)
 		sendResponse[any](w, msg, http.StatusOK, nil)
 	}
 }

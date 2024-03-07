@@ -16,12 +16,17 @@ const (
 
 func NewAccount(name, lastName, email, password string) (*Account, error) {
 	a := &Account{
-		ID:        core.NewId(),
-		Name:      name,
-		LastName:  lastName,
-		Email:     email,
-		AvatarURL: "",
-		Password:  password,
+		ID:             core.NewId(),
+		Name:           name,
+		LastName:       lastName,
+		Email:          email,
+		AvatarURL:      nil,
+		Password:       password,
+		UploadQuantity: 0,
+		DeletedBy:      nil,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      nil,
+		DeletedAt:      nil,
 	}
 
 	a.Role = a.accountRoles()[defaultRole]
@@ -38,15 +43,18 @@ func NewAccount(name, lastName, email, password string) (*Account, error) {
 }
 
 type Account struct {
-	ID        string    `db:"id" json:"id"`
-	Name      string    `db:"name" json:"name"`
-	LastName  string    `db:"last_name" json:"last_name"`
-	Email     string    `db:"email" json:"email"`
-	Role      string    `db:"role" json:"role"`
-	AvatarURL string    `db:"avatar_url" json:"avatar_url"`
-	Password  string    `db:"password" json:"password"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	ID             string     `db:"id" json:"id"`
+	Name           string     `db:"name" json:"name"`
+	LastName       string     `db:"last_name" json:"last_name"`
+	Email          string     `db:"email" json:"email"`
+	Role           string     `db:"role" json:"role"`
+	AvatarURL      *string    `db:"avatar_url" json:"avatar_url"`
+	UploadQuantity int        `db:"upload_quantity" json:"upload_quantity"`
+	Password       string     `db:"password" json:"password"`
+	DeletedBy      *string    `db:"deleted_by" json:"deleted_by"`
+	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt      *time.Time `db:"updated_at" json:"updated_at"`
+	DeletedAt      *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 func (a *Account) Validate() error {
@@ -111,6 +119,11 @@ func (a *Account) Validate() error {
 	}
 
 	return nil
+}
+
+func (a *Account) Touch() {
+	now := time.Now()
+	a.UpdatedAt = &now
 }
 
 func (a *Account) accountRoles() map[string]string {

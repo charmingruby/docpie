@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	// Setup basics
+	// Setup
 	logger := logger.SetupLogger()
 
 	cfg, err := config.LoadConfig()
@@ -43,9 +43,11 @@ func main() {
 	// Initialize REST server
 	router := mux.NewRouter().StrictSlash(true)
 
+	// Initialize the routes
 	rest.NewAccountHandler(cfg.Logger, accountsService).Register(router)
 	rest.NewPingHandler().Register(router)
 
+	// Initialize the server
 	restServer, err := rest.NewServer(cfg, router, true)
 	if err != nil {
 		logger.Errorf("error instantiating server: %s", err.Error())
