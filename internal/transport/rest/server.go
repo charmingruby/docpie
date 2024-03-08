@@ -51,7 +51,7 @@ func NewServer(cfg *config.Config, router *mux.Router, visibleRoutes bool) (*Ser
 }
 
 func (s *Server) Start() error {
-	s.Config.Logger.Infof("Server is running at %s", s.Server.Addr)
+	s.Config.Logger.Info("HTTP server is running.")
 
 	if err := s.Server.ListenAndServe(); err != nil {
 		return err

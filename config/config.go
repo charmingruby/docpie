@@ -3,7 +3,6 @@ package config
 import (
 	env "github.com/caarlos0/env/v6"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
@@ -42,14 +41,11 @@ type ServerConfig struct {
 	Host string
 }
 
-func LoadConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
+func LoadConfig(logger *logrus.Logger) (*Config, error) {
+	logger.Info("Loading environment configuration...")
 
 	environment := envConfig{}
-	err = env.Parse(&environment)
+	err := env.Parse(&environment)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +64,8 @@ func LoadConfig() (*Config, error) {
 			Host: environment.ServerHost,
 		},
 	}
+
+	logger.Info("Environment loaded.")
 
 	return cfg, nil
 }
