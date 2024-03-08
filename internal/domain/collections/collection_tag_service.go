@@ -3,24 +3,24 @@ package collections
 import "github.com/charmingruby/upl/internal/validation"
 
 type CollectionTagService struct {
-	collectionTagsRepository CollectionTagsRepository
+	repo CollectionTagsRepository
 }
 
-func NewCollectionTagsService(collectionTagsRepository CollectionTagsRepository) *CollectionTagService {
+func NewCollectionTagsService(repo CollectionTagsRepository) *CollectionTagService {
 	return &CollectionTagService{
-		collectionTagsRepository: collectionTagsRepository,
+		repo: repo,
 	}
 }
 
 func (s *CollectionTagService) Create(tag *CollectionTag) error {
-	isNameAvailable, _ := s.collectionTagsRepository.FindByName(tag.Name)
-	if isNameAvailable != nil {
+	_, err := s.repo.FindByName(tag.Name)
+	if err == nil {
 		return &validation.ServiceError{
 			Message: validation.NewUniqueValidationErrorMessage(tag.Name),
 		}
 	}
 
-	if err := s.collectionTagsRepository.Create(tag); err != nil {
+	if err := s.repo.Create(tag); err != nil {
 		return err
 	}
 

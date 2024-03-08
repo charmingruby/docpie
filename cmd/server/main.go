@@ -44,16 +44,23 @@ func main() {
 		os.Exit(1)
 	}
 
+	collectionsRepository, err := postgres.NewCollectionsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	if err != nil {
+		logger.Errorf("error initializing collection postgres repository: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// Initialize services
 	accountsService := accounts.NewAccountService(accountsRepository)
-	collectionsService := collections.NewCollectionTagsService(collectionTagsRepository)
+	collectionTagsService := collections.NewCollectionTagsService(collectionTagsRepository)
+	collectionsService := collections.NewCollectionService(collectionsRepository, collectionTagsRepository, accountsRepository)
 
 	// Initialize REST server
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Initialize the routes
 	rest.NewAccountsHandler(cfg.Logger, accountsService).Register(router)
-	rest.NewCollectionsHandler(cfg.Logger, collectionsService).Register(router)
+	rest.NewCollectionsHandler(cfg.Logger, collectionsService, collectionTagsService).Register(router)
 	rest.NewPingHandler().Register(router)
 
 	// Initialize the server

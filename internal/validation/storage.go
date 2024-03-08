@@ -23,5 +23,5 @@ func NewQueryErrorMessage(entity, action string, err error) string {
 }
 
 func NewResourceNotFoundByErrorMessage(identifier string, entity, field string) string {
-	return fmt.Sprintf("error finding %s with %s '%s'", entity, field, identifier)
+	return fmt.Sprintf("error finding %s with %s: '%s'", entity, field, identifier)
 }

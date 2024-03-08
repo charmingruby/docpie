@@ -2,6 +2,6 @@ package endpoints
 
 import "fmt"
 
-func NewCreateResponse(identifier string) string {
-	return fmt.Sprintf("'%s' created successfully.", identifier)
+func NewCreateResponse(entity string) string {
+	return fmt.Sprintf("%s created successfully.", entity)
 }

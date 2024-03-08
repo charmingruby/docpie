@@ -8,16 +8,16 @@ import (
 )
 
 type AccountService struct {
-	accountRepository AccountRepository
+	repo AccountRepository
 }
 
-func NewAccountService(accountRepository AccountRepository) *AccountService {
-	svc := &AccountService{accountRepository: accountRepository}
+func NewAccountService(repo AccountRepository) *AccountService {
+	svc := &AccountService{repo: repo}
 	return svc
 }
 
 func (s *AccountService) Authenticate(email, password string) (*Account, error) {
-	account, err := s.accountRepository.FindByEmail(email)
+	account, err := s.repo.FindByEmail(email)
 	if err != nil {
 		resourceNotFoundError := &validation.ResourceNotFoundError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
@@ -35,18 +35,19 @@ func (s *AccountService) Authenticate(email, password string) (*Account, error) 
 		return nil, credentialsNotMatchError
 	}
 
-	return account, nil
+	return &account, nil
 }
 
 func (s *AccountService) Register(account *Account) error {
-	isEmailAvailable, _ := s.accountRepository.FindByEmail(account.Email)
-	if isEmailAvailable != nil {
+	_, err := s.repo.FindByEmail(account.Email)
+
+	if err == nil {
 		return &validation.ServiceError{
 			Message: validation.NewUniqueValidationErrorMessage(account.Email),
 		}
 	}
 
-	if err := s.accountRepository.Create(account); err != nil {
+	if err := s.repo.Create(account); err != nil {
 		return err
 	}
 
@@ -54,7 +55,7 @@ func (s *AccountService) Register(account *Account) error {
 }
 
 func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, error) {
-	account, err := s.accountRepository.FindById(accountID)
+	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
@@ -79,7 +80,7 @@ func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, er
 	account.Role = namedRole
 	account.Touch()
 
-	if err := s.accountRepository.Save(account); err != nil {
+	if err := s.repo.Save(&account); err != nil {
 		return "", err
 	}
 
@@ -87,7 +88,7 @@ func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, er
 }
 
 func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
-	account, err := s.accountRepository.FindById(accountID)
+	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
@@ -99,7 +100,7 @@ func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 	account.AvatarURL = &fileURL
 	account.Touch()
 
-	if err := s.accountRepository.Save(account); err != nil {
+	if err := s.repo.Save(&account); err != nil {
 		return err
 	}
 
@@ -107,7 +108,7 @@ func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 }
 
 func (s *AccountService) DeleteAnAccount(accountID, managerID string) error {
-	account, err := s.accountRepository.FindById(accountID)
+	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
 			Message: validation.NewResourceNotFoundErrorMessage("account"),
@@ -121,7 +122,7 @@ func (s *AccountService) DeleteAnAccount(accountID, managerID string) error {
 	now := time.Now()
 	account.DeletedAt = &now
 
-	if err := s.accountRepository.Save(account); err != nil {
+	if err := s.repo.Save(&account); err != nil {
 		return err
 	}
 

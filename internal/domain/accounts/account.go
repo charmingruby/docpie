@@ -16,17 +16,19 @@ const (
 
 func NewAccount(name, lastName, email, password string) (*Account, error) {
 	a := &Account{
-		ID:             core.NewId(),
-		Name:           name,
-		LastName:       lastName,
-		Email:          email,
-		AvatarURL:      nil,
-		Password:       password,
-		UploadQuantity: 0,
-		DeletedBy:      nil,
-		CreatedAt:      time.Now(),
-		UpdatedAt:      nil,
-		DeletedAt:      nil,
+		ID:                         core.NewId(),
+		Name:                       name,
+		LastName:                   lastName,
+		Email:                      email,
+		AvatarURL:                  nil,
+		Password:                   password,
+		CollectionsCreatedQuantity: 0,
+		CollectionsMemberQuantity:  0,
+		UploadQuantity:             0,
+		DeletedBy:                  nil,
+		CreatedAt:                  time.Now(),
+		UpdatedAt:                  nil,
+		DeletedAt:                  nil,
 	}
 
 	a.Role = a.accountRoles()[defaultRole]
@@ -43,18 +45,20 @@ func NewAccount(name, lastName, email, password string) (*Account, error) {
 }
 
 type Account struct {
-	ID             string     `db:"id" json:"id"`
-	Name           string     `db:"name" json:"name"`
-	LastName       string     `db:"last_name" json:"last_name"`
-	Email          string     `db:"email" json:"email"`
-	Role           string     `db:"role" json:"role"`
-	AvatarURL      *string    `db:"avatar_url" json:"avatar_url"`
-	UploadQuantity int        `db:"upload_quantity" json:"upload_quantity"`
-	Password       string     `db:"password" json:"password"`
-	DeletedBy      *string    `db:"deleted_by" json:"deleted_by"`
-	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
-	UpdatedAt      *time.Time `db:"updated_at" json:"updated_at"`
-	DeletedAt      *time.Time `db:"deleted_at" json:"deleted_at"`
+	ID                         string     `db:"id" json:"id"`
+	Name                       string     `db:"name" json:"name"`
+	LastName                   string     `db:"last_name" json:"last_name"`
+	Email                      string     `db:"email" json:"email"`
+	Role                       string     `db:"role" json:"role"`
+	AvatarURL                  *string    `db:"avatar_url" json:"avatar_url"`
+	CollectionsCreatedQuantity int        `db:"collections_created_quantity" json:"collections_created_quantity"`
+	CollectionsMemberQuantity  int        `db:"collections_member_quantity" json:"collections_member_quantity"`
+	UploadQuantity             int        `db:"upload_quantity" json:"upload_quantity"`
+	Password                   string     `db:"password" json:"password"`
+	DeletedBy                  *string    `db:"deleted_by" json:"deleted_by"`
+	CreatedAt                  time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt                  *time.Time `db:"updated_at" json:"updated_at"`
+	DeletedAt                  *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 func (a *Account) Validate() error {

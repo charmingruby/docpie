@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"fmt"
+
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation"
 	"github.com/jmoiron/sqlx"
@@ -16,10 +18,10 @@ const (
 
 func accountQueries() map[string]string {
 	return map[string]string{
-		createAccount:      `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url, upload_quantity) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+		createAccount:      `INSERT INTO accounts (id, name, last_name, email, role, password, avatar_url, upload_quantity, collections_member_quantity, collections_created_quantity) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
 		findAccountByEmail: `SELECT * FROM accounts WHERE email = $1`,
 		findAccountById:    `SELECT * FROM accounts WHERE id = $1`,
-		saveAccount:        `UPDATE accounts SET name = $1, last_name = $2, email = $3, role = $4, avatar_url = $5, updated_at = $6, deleted_by = $7, deleted_at = $8, upload_quantity = $9 where id = $10`,
+		saveAccount:        `UPDATE accounts SET name = $1, last_name = $2, email = $3, role = $4, avatar_url = $5, updated_at = $6, deleted_by = $7, deleted_at = $8, upload_quantity = $9, collections_member_quantity= $10, collections_created_quantity = $11 where id = $12`,
 	}
 }
 
@@ -43,9 +45,7 @@ func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsReposit
 	}
 
 	if len(errs) > 0 {
-		return nil, &validation.StorageError{
-			Message: validation.NewRepositoryStatementsPreparationErrorMessage("accounts repository"),
-		}
+		return nil, fmt.Errorf("accounts repository wasn't able to build all the statements")
 	}
 
 	return &AccountsRepository{
@@ -57,9 +57,7 @@ func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsReposit
 func (r *AccountsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	stmt, ok := r.statements[queryName]
 	if !ok {
-		return nil, &validation.StorageError{
-			Message: validation.NewQueryStatementPreparationErrorMessage(queryName),
-		}
+		return nil, fmt.Errorf("prepared statement '%s' not found", queryName)
 	}
 
 	return stmt, nil
@@ -70,46 +68,45 @@ func (r *AccountsRepository) Create(account *accounts.Account) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL, account.UploadQuantity)
+
+	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL, account.UploadQuantity, account.CollectionsMemberQuantity, account.CollectionsCreatedQuantity)
 	if err != nil {
-		return &validation.StorageError{
-			Message: validation.NewQueryErrorMessage("account", "creating", err),
-		}
+		return fmt.Errorf("error %s %s: %v", "create", "account", err.Error())
 	}
 
 	return nil
 }
 
-func (r *AccountsRepository) FindByEmail(email string) (*accounts.Account, error) {
+func (r *AccountsRepository) FindByEmail(email string) (accounts.Account, error) {
 	stmt, err := r.statement(findAccountByEmail)
 	if err != nil {
-		return nil, err
+		return accounts.Account{}, err
 	}
 
-	account := accounts.Account{}
-	if err = stmt.Get(&account, email); err != nil {
-		return nil, &validation.StorageError{
+	var a accounts.Account
+	if err = stmt.Get(&a, email); err != nil {
+		return accounts.Account{}, &validation.StorageError{
 			Message: validation.NewResourceNotFoundByErrorMessage(email, "account", "email"),
 		}
 	}
 
-	return &account, nil
+	return a, nil
 }
 
-func (r *AccountsRepository) FindById(id string) (*accounts.Account, error) {
+func (r *AccountsRepository) FindById(id string) (accounts.Account, error) {
 	stmt, err := r.statement(findAccountById)
 	if err != nil {
-		return nil, err
+		return accounts.Account{}, err
 	}
 
-	account := accounts.Account{}
-	if err := stmt.Get(&account, id); err != nil {
-		return nil, &validation.StorageError{
+	var a accounts.Account
+	if err := stmt.Get(&a, id); err != nil {
+		return accounts.Account{}, &validation.StorageError{
 			Message: validation.NewResourceNotFoundByErrorMessage(id, "account", "id"),
 		}
 	}
 
-	return &account, nil
+	return accounts.Account{}, nil
 }
 
 func (r *AccountsRepository) Save(account *accounts.Account) error {
@@ -118,7 +115,7 @@ func (r *AccountsRepository) Save(account *accounts.Account) error {
 		return err
 	}
 
-	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.AvatarURL, account.UpdatedAt, account.DeletedBy, account.DeletedAt, account.UploadQuantity, account.ID)
+	_, err = stmt.Exec(account.Name, account.LastName, account.Email, account.Role, account.AvatarURL, account.UpdatedAt, account.DeletedBy, account.DeletedAt, account.UploadQuantity, account.CollectionsMemberQuantity, account.CollectionsCreatedQuantity, account.ID)
 	if err != nil {
 		return &validation.StorageError{
 			Message: validation.NewQueryErrorMessage("account", "creating", err),

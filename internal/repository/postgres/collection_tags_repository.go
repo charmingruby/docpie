@@ -77,18 +77,18 @@ func (r *CollectionTagsRepository) Create(tag *collections.CollectionTag) error 
 	return nil
 }
 
-func (r *CollectionTagsRepository) FindByName(name string) (*collections.CollectionTag, error) {
+func (r *CollectionTagsRepository) FindByName(name string) (collections.CollectionTag, error) {
 	stmt, err := r.statement(findCollectionTagByName)
 	if err != nil {
-		return nil, err
+		return collections.CollectionTag{}, err
 	}
 
-	tag := collections.CollectionTag{}
+	var tag collections.CollectionTag
 	if err = stmt.Get(&tag, name); err != nil {
-		return nil, &validation.StorageError{
+		return collections.CollectionTag{}, &validation.StorageError{
 			Message: validation.NewResourceNotFoundByErrorMessage(name, "collection tag", "name"),
 		}
 	}
 
-	return &tag, nil
+	return tag, nil
 }

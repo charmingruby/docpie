@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     avatar_url varchar,
     role varchar NOT NULL,
     password varchar NOT NULL,
+
+    collections_created_quantity int NOT NULL,
+    collections_member_quantity integer NOT NULL,
     upload_quantity integer NOT NULL,
 
     deleted_by UUID REFERENCES accounts (id),
@@ -25,14 +28,14 @@ CREATE TABLE IF NOT EXISTS collection_tags (
     description varchar NOT NULL,
 
     created_at timestamp DEFAULT now() NOT NULL,
-    updated_at timestamp DEFAULT now() NOT NULL
+    updated_at timestamp 
 );
 
 CREATE TABLE IF NOT EXISTS collections (
     id UUID PRIMARY KEY NOT NULL,
     
     name varchar NOT NULL,
-    description varchar NOT NULL,
+    description varchar,
     secret varchar NOT NULL,
     tag varchar NOT NULL,
     
@@ -41,21 +44,25 @@ CREATE TABLE IF NOT EXISTS collections (
 
     tag_id UUID REFERENCES collection_tags (id) NOT NULL,
     creator_id UUID REFERENCES accounts (id) NOT NULL,
+    deleted_by UUID REFERENCES accounts (id),
 
     created_at timestamp DEFAULT now() NOT NULL,
-    updated_at timestamp DEFAULT now() NOT NULL
+    updated_at timestamp,
+    deleted_at timestamp
 );
 
 CREATE TABLE IF NOT EXISTS collection_members (
     id UUID PRIMARY KEY NOT NULL,
+    
+    role varchar NOT NULL,
+    upload_quantity integer NOT NULL,
 
     account_id UUID REFERENCES accounts (id) NOT NULL,
     collection_id UUID REFERENCES collections (id) NOT NULL,
-    upload_quantity integer NOT NULL,
 
     joined_at timestamp DEFAULT now() NOT NULL,
     left_at timestamp,
-    updated_at timestamp DEFAULT now() NOT NULL   
+    updated_at timestamp    
 );
 
 CREATE TABLE IF NOT EXISTS uploads (
@@ -64,7 +71,6 @@ CREATE TABLE IF NOT EXISTS uploads (
     name varchar NOT NULL,
     url varchar NOT NULL,
 
-    file_name varchar NOT NULL,
     file_size varchar NOT NULL,
     file_mimetype varchar NOT NULL,
 

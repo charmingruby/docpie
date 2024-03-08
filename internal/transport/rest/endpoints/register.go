@@ -42,11 +42,11 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 			return
 		}
 
-		logger.Info(fmt.Sprintf("'%s' account created", newAccount.Email))
-
+		msg := NewCreateResponse("Account")
+		logger.Info(fmt.Sprintf("Account: '%s' created successfully.", newAccount.Email))
 		sendResponse[any](
 			w,
-			NewCreateResponse(fmt.Sprintf("%s %s", request.Name, request.LastName)),
+			msg,
 			http.StatusCreated,
 			nil,
 		)
