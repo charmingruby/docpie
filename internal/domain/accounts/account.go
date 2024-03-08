@@ -11,7 +11,7 @@ import (
 
 const (
 	managerRole = "manager"
-	defaultRole = "default"
+	defaultRole = "member"
 )
 
 func NewAccount(name, lastName, email, password string) (*Account, error) {

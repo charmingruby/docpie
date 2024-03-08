@@ -10,19 +10,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type AccountHandler struct {
+type AccountsHandler struct {
 	accountService *accounts.AccountService
 	logger         *logrus.Logger
 }
 
-func NewAccountHandler(logger *logrus.Logger, accountService *accounts.AccountService) *AccountHandler {
-	return &AccountHandler{
+func NewAccountsHandler(logger *logrus.Logger, accountService *accounts.AccountService) *AccountsHandler {
+	return &AccountsHandler{
 		accountService: accountService,
 		logger:         logger,
 	}
 }
 
-func (h *AccountHandler) Register(router *mux.Router) {
+func (h *AccountsHandler) Register(router *mux.Router) {
 	registerEndpoint := endpoints.MakeRegisterEndpoint(h.logger, h.accountService)
 	authenticateEndpoint := endpoints.MakeAuthenticateEndpoint(h.logger, h.accountService)
 	updateAnAccountRoleEndpoint := endpoints.MakeUpdateAnAccountRole(h.logger, h.accountService)

@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS collections (
     name varchar NOT NULL,
     description varchar NOT NULL,
     secret varchar NOT NULL,
+    tag varchar NOT NULL,
     
     uploads_quantity integer NOT NULL,
     members_quantity integer NOT NULL,

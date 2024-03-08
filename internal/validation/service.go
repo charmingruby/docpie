@@ -31,7 +31,7 @@ func NewNotModifiedErrorMessage(field, value string) string {
 }
 
 func NewUniqueValidationErrorMessage(value string) string {
-	return fmt.Sprintf("'%s' is already taken", value)
+	return fmt.Sprintf("'%s' is already taken.", value)
 }
 
 func NewResourceNotFoundErrorMessage(resource string) string {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmingruby/upl/config"
 	"github.com/charmingruby/upl/internal/domain/accounts"
+	"github.com/charmingruby/upl/internal/domain/collections"
 	"github.com/charmingruby/upl/internal/repository/postgres"
 	"github.com/charmingruby/upl/internal/transport/rest"
 	"github.com/charmingruby/upl/pkg/database/postgresql"
@@ -37,14 +38,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	collectionTagsRepository, err := postgres.NewCollectionTagsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	if err != nil {
+		logger.Errorf("error initializing collection tags postgres repository: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// Initialize services
 	accountsService := accounts.NewAccountService(accountsRepository)
+	collectionsService := collections.NewCollectionTagsService(collectionTagsRepository)
 
 	// Initialize REST server
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Initialize the routes
-	rest.NewAccountHandler(cfg.Logger, accountsService).Register(router)
+	rest.NewAccountsHandler(cfg.Logger, accountsService).Register(router)
+	rest.NewCollectionsHandler(cfg.Logger, collectionsService).Register(router)
 	rest.NewPingHandler().Register(router)
 
 	// Initialize the server
