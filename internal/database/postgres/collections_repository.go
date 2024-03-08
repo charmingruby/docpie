@@ -7,20 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	createCollection     = "create collection"
-	findCollectionByName = "find collection by name"
-	saveCollection       = "save collection"
-)
-
-func collectionsQueries() map[string]string {
-	return map[string]string{
-		createCollection:     "INSERT INTO collections (id, name, description, secret, tag, tag_id, creator_id, deleted_by, deleted_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-		findCollectionByName: "SELECT * FROM collections WHERE name = $1",
-		saveCollection:       "UPDATE collections SET name = $1, description = $2, tag = $3, tag_id = $4",
-	}
-}
-
 type CollectionsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
@@ -69,7 +55,7 @@ func (r *CollectionsRepository) Create(collection *collections.Collection) error
 		return err
 	}
 
-	_, err = stmt.Exec(collection.ID, collection.Name, collection.Description, collection.Secret, collection.Tag, collection.TagID, collection.CreatorID, collection.DeletedBy, collection.DeletedAt)
+	_, err = stmt.Exec(collection.ID, collection.Name, collection.Description, collection.Secret, collection.Tag, collection.TagID, collection.UploadsQuantity, collection.MembersQuantity, collection.CreatorID, collection.DeletedBy, collection.DeletedAt)
 	if err != nil {
 		return &validation.StorageError{
 			Message: validation.NewQueryErrorMessage("collection", "creating", err),
@@ -93,4 +79,32 @@ func (r *CollectionsRepository) FindByName(name string) (collections.Collection,
 	}
 
 	return collection, nil
+}
+
+func (r *CollectionsRepository) Save(collections *collections.Collection) error {
+	stmt, err := r.statement(saveCollection)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(
+		collections.Name,
+		collections.Description,
+		collections.Tag,
+		collections.TagID,
+		collections.UploadsQuantity,
+		collections.MembersQuantity,
+		collections.DeletedBy,
+		collections.UpdatedAt,
+		collections.DeletedAt,
+		collections.ID,
+	)
+
+	if err != nil {
+		return &validation.StorageError{
+			Message: validation.NewQueryErrorMessage("collection", "saving", err),
+		}
+	}
+
+	return nil
 }

@@ -16,7 +16,7 @@ func (s *CollectionTagService) Create(tag *CollectionTag) error {
 	_, err := s.repo.FindByName(tag.Name)
 	if err == nil {
 		return &validation.ServiceError{
-			Message: validation.NewUniqueValidationErrorMessage(tag.Name),
+			Message: validation.NewUniqueValidationErrorMessage("Name"),
 		}
 	}
 

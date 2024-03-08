@@ -20,7 +20,7 @@ func (s *AccountService) Authenticate(email, password string) (*Account, error) 
 	account, err := s.repo.FindByEmail(email)
 	if err != nil {
 		resourceNotFoundError := &validation.ResourceNotFoundError{
-			Message: validation.NewResourceNotFoundErrorMessage("account"),
+			Message: validation.NewInvalidCredentialsErrorMessage(),
 		}
 
 		return nil, resourceNotFoundError
@@ -43,7 +43,7 @@ func (s *AccountService) Register(account *Account) error {
 
 	if err == nil {
 		return &validation.ServiceError{
-			Message: validation.NewUniqueValidationErrorMessage(account.Email),
+			Message: validation.NewUniqueValidationErrorMessage("Email"),
 		}
 	}
 
@@ -54,44 +54,44 @@ func (s *AccountService) Register(account *Account) error {
 	return nil
 }
 
-func (s *AccountService) UpdateAnAccountRole(accountID, role string) (string, error) {
+func (s *AccountService) UpdateAnAccountRole(accountID, role string) (*Account, error) {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("account"),
+			Message: validation.NewResourceNotFoundErrorMessage("Account"),
 		}
 
-		return "", resourceNotFoundError
+		return nil, resourceNotFoundError
 	}
 
-	namedRole, err := account.isRoleValid(role)
+	namedRole, err := account.validateRole(role)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if account.Role == namedRole {
 		notModifiedError := &validation.NotModifiedError{
-			Message: validation.NewNotModifiedErrorMessage(account.ID, namedRole),
+			Message: validation.NewNotModifiedErrorMessage(),
 		}
 
-		return "", notModifiedError
+		return nil, notModifiedError
 	}
 
-	account.Role = namedRole
+	account.SetRole(namedRole)
 	account.Touch()
 
 	if err := s.repo.Save(&account); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return account.Role, nil
+	return &account, nil
 }
 
 func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("account"),
+			Message: validation.NewResourceNotFoundErrorMessage("Account"),
 		}
 
 		return resourceNotFoundError
@@ -111,7 +111,7 @@ func (s *AccountService) DeleteAnAccount(accountID, managerID string) error {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
 		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("account"),
+			Message: validation.NewResourceNotFoundErrorMessage("Account"),
 		}
 
 		return resourceNotFoundError

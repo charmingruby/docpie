@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     role varchar NOT NULL,
     password varchar NOT NULL,
 
-    collections_created_quantity int NOT NULL,
+    collections_created_quantity integer NOT NULL,
     collections_member_quantity integer NOT NULL,
     upload_quantity integer NOT NULL,
 

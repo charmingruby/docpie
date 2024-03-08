@@ -130,6 +130,10 @@ func (a *Account) Touch() {
 	a.UpdatedAt = &now
 }
 
+func (a *Account) SetRole(role string) {
+	a.Role = role
+}
+
 func (a *Account) accountRoles() map[string]string {
 	return map[string]string{
 		managerRole: "manager",
@@ -137,7 +141,7 @@ func (a *Account) accountRoles() map[string]string {
 	}
 }
 
-func (a *Account) isRoleValid(role string) (string, error) {
+func (a *Account) validateRole(role string) (string, error) {
 	namedRole, ok := a.accountRoles()[role]
 
 	if !ok {

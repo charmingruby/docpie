@@ -26,18 +26,18 @@ func (e *NotModifiedError) Error() string {
 	return e.Message
 }
 
-func NewNotModifiedErrorMessage(field, value string) string {
-	return fmt.Sprintf("'%s' is already '%s'", field, value)
+func NewNotModifiedErrorMessage() string {
+	return "Nothing to update."
 }
 
-func NewUniqueValidationErrorMessage(value string) string {
-	return fmt.Sprintf("'%s' is already taken.", value)
+func NewUniqueValidationErrorMessage(field string) string {
+	return fmt.Sprintf("%s is already taken.", field)
 }
 
 func NewResourceNotFoundErrorMessage(resource string) string {
-	return fmt.Sprintf("%s not found", resource)
+	return fmt.Sprintf("%s not found.", resource)
 }
 
 func NewInvalidCredentialsErrorMessage() string {
-	return "invalid credentials"
+	return "invalid credentials."
 }

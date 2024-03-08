@@ -27,7 +27,7 @@ func MakeUpdateAnAccountRole(logger *logrus.Logger, accountsService *accounts.Ac
 			return
 		}
 
-		namedRole, err := accountsService.UpdateAnAccountRole(accountToUpdateID, request.Role)
+		acc, err := accountsService.UpdateAnAccountRole(accountToUpdateID, request.Role)
 		if err != nil {
 			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
 			if ok {
@@ -49,7 +49,7 @@ func MakeUpdateAnAccountRole(logger *logrus.Logger, accountsService *accounts.Ac
 			return
 		}
 
-		msg := fmt.Sprintf("'%s' is now: '%s'", accountToUpdateID, namedRole)
+		msg := fmt.Sprintf("'%s' is now: '%s'", acc.Name, acc.Role)
 		logger.Info(msg)
 		sendResponse[any](w, msg, http.StatusOK, nil)
 	}

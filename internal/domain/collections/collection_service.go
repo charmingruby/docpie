@@ -1,6 +1,8 @@
 package collections
 
 import (
+	"errors"
+
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation"
 )
@@ -8,43 +10,76 @@ import (
 type CollectionService struct {
 	repo         CollectionsRepository
 	tagsRepo     CollectionTagsRepository
+	membersRepo  CollectionMembersRepository
 	accountsRepo accounts.AccountRepository
 }
 
-func NewCollectionService(repo CollectionsRepository, tagsRepo CollectionTagsRepository, accountsRepo accounts.AccountRepository) *CollectionService {
+func NewCollectionService(repo CollectionsRepository, tagsRepo CollectionTagsRepository, membersRepo CollectionMembersRepository, accountsRepo accounts.AccountRepository) *CollectionService {
 	return &CollectionService{
 		repo:         repo,
 		tagsRepo:     tagsRepo,
 		accountsRepo: accountsRepo,
+		membersRepo:  membersRepo,
 	}
 }
 
 func (s *CollectionService) Create(collection *Collection) error {
-	_, err := s.repo.FindByName(collection.Name)
+	owner, err := s.accountsRepo.FindById(collection.CreatorID)
+	if err != nil {
+		resourceNotFoundError := &validation.ResourceNotFoundError{
+			Message: validation.NewResourceNotFoundErrorMessage("Account"),
+		}
+
+		return resourceNotFoundError
+	}
+
+	if owner.CollectionsCreatedQuantity > 3 {
+		return errors.New("members can only create 3 collections")
+	}
+
+	if owner.CollectionsMemberQuantity > 10 {
+		return errors.New("members can only be mmember of 10 collections")
+	}
+
+	_, err = s.repo.FindByName(collection.Name)
 	if err == nil {
 		return &validation.ServiceError{
 			Message: validation.NewUniqueValidationErrorMessage(collection.Name),
 		}
 	}
 
-	tag, err := s.tagsRepo.FindByName(collection.Tag)
+	tag, err := s.tagsRepo.FindByID(collection.TagID)
+
 	if err != nil {
 		resourceNotFoundError := &validation.ResourceNotFoundError{
-			Message: validation.NewResourceNotFoundErrorMessage("collection_tag"),
+			Message: validation.NewResourceNotFoundErrorMessage("Collection Tag"),
 		}
 
 		return resourceNotFoundError
 	}
 
-	collection.TagID = &tag.ID
+	collection.Tag = &tag.Name
 
 	if err := s.repo.Create(collection); err != nil {
 		return err
 	}
 
-	// Create a collection members as owner
+	member, err := NewCollectionMember("manager", owner.ID, collection.ID)
+	if err != nil {
+		return err
+	}
+	if err := s.membersRepo.Create(member); err != nil {
+		return err
+	}
+
 	// Increments the collections members
-	// Update account
+	collection.Touch()
+	collection.MembersQuantity += 1
+
+	owner.CollectionsCreatedQuantity += 1
+	if err := s.accountsRepo.Save(&owner); err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -37,8 +37,8 @@ func MakeDeleteAnAccountEndpoint(logger *logrus.Logger, accountsService *account
 			return
 		}
 
-		msg := fmt.Sprintf("account: '%s' deleted successfully by '%s'.", accountToDeleteID, payload.AccountID)
-		logger.Info(msg)
+		logger.Info(fmt.Sprintf("account: '%s' deleted successfully by '%s'.", accountToDeleteID, payload.AccountID))
+		msg := "Account deleted successfully."
 		sendResponse[any](w, msg, http.StatusOK, nil)
 	}
 }

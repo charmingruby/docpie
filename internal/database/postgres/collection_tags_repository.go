@@ -7,18 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	createCollectionTag     = "create collection tag"
-	findCollectionTagByName = "find collection tag by name"
-)
-
-func collectionTagsQueries() map[string]string {
-	return map[string]string{
-		createCollectionTag:     "INSERT INTO collection_tags (id, name, description) VALUES ($1, $2, $3) RETURNING *",
-		findCollectionTagByName: "SELECT * FROM collection_tags WHERE name = $1",
-	}
-}
-
 type CollectionTagsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
@@ -87,6 +75,23 @@ func (r *CollectionTagsRepository) FindByName(name string) (collections.Collecti
 	if err = stmt.Get(&tag, name); err != nil {
 		return collections.CollectionTag{}, &validation.StorageError{
 			Message: validation.NewResourceNotFoundByErrorMessage(name, "collection tag", "name"),
+		}
+	}
+
+	return tag, nil
+}
+
+func (r *CollectionTagsRepository) FindByID(id string) (collections.CollectionTag, error) {
+	stmt, err := r.statement(findCollectionTagByID)
+	if err != nil {
+		return collections.CollectionTag{}, err
+	}
+
+	var tag collections.CollectionTag
+	if err = stmt.Get(&tag, id); err != nil {
+
+		return collections.CollectionTag{}, &validation.StorageError{
+			Message: validation.NewResourceNotFoundByErrorMessage(id, "collection tag", "id"),
 		}
 	}
 

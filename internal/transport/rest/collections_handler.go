@@ -26,7 +26,7 @@ func NewCollectionsHandler(logger *logrus.Logger, collectionService *collections
 
 func (h *CollectionsHandler) Register(router *mux.Router) {
 	createCollectionTagEndpoint := endpoints.MakeCreateCollectionTagEndpoint(h.logger, h.collectionTagService)
-	createCollectionEndpoint := endpoints.MakeCreateCollectionEndpoint(h.collectionsService, h.collectionTagService)
+	createCollectionEndpoint := endpoints.MakeCreateCollectionEndpoint(h.logger, h.collectionsService, h.collectionTagService)
 
 	router.HandleFunc("/collections/tags", middlewares.ProtectedRouteByRole(h.logger, "manager", createCollectionTagEndpoint)).Methods(http.MethodPost)
 	router.HandleFunc("/collections", middlewares.ProtectedRoute(h.logger, createCollectionEndpoint)).Methods(http.MethodPost)

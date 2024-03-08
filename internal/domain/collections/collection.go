@@ -9,14 +9,14 @@ import (
 	"github.com/charmingruby/upl/pkg/cryptography"
 )
 
-func NewCollection(name, secret, description, tag, creatorID string) (*Collection, error) {
+func NewCollection(name, secret, description, tagID, creatorID string) (*Collection, error) {
 	collection := &Collection{
 		ID:              core.NewId(),
 		Name:            name,
 		Description:     helpers.IfOrNil[string](description != "", description),
 		Secret:          secret,
-		TagID:           nil,
-		Tag:             tag,
+		TagID:           tagID,
+		Tag:             nil,
 		CreatorID:       creatorID,
 		DeletedBy:       nil,
 		UploadsQuantity: 0,
@@ -38,10 +38,10 @@ type Collection struct {
 	Name            string     `db:"name" json:"name"`
 	Description     *string    `db:"description" json:"description"`
 	Secret          string     `db:"secret" json:"secret"`
-	Tag             string     `db:"tag" json:"tag"`
+	Tag             *string    `db:"tag" json:"tag"`
 	UploadsQuantity uint       `db:"uploads_quantity" json:"uploads_quantity"`
 	MembersQuantity uint       `db:"members_quantity" json:"members_quantity"`
-	TagID           *string    `db:"tag_id" json:"tag_id"`
+	TagID           string     `db:"tag_id" json:"tag_id"`
 	CreatorID       string     `db:"creator_id" json:"creator_id"`
 	DeletedBy       *string    `db:"deleted_by" json:"deleted_by"`
 	CreatedAt       time.Time  `db:"created_at" json:"created_at"`
@@ -92,13 +92,18 @@ func (c *Collection) Validate() error {
 		}
 	}
 
-	if validation.IsEmpty(c.Tag) {
+	if validation.IsEmpty(c.TagID) {
 		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("tag"),
+			Message: validation.NewRequiredFieldErrorMessage("tag_id"),
 		}
 	}
 
 	return nil
+}
+
+func (c *Collection) Touch() {
+	now := time.Now()
+	c.UpdatedAt = &now
 }
 
 func (c *Collection) encryptSecret() error {
