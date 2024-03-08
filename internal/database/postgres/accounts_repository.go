@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
@@ -69,8 +69,8 @@ func (r *AccountsRepository) FindByEmail(email string) (accounts.Account, error)
 
 	var a accounts.Account
 	if err = stmt.Get(&a, email); err != nil {
-		return accounts.Account{}, &validation.StorageError{
-			Message: validation.NewResourceNotFoundByErrorMessage(email, "account", "email"),
+		return accounts.Account{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
 		}
 	}
 
@@ -85,8 +85,8 @@ func (r *AccountsRepository) FindById(id string) (accounts.Account, error) {
 
 	var a accounts.Account
 	if err := stmt.Get(&a, id); err != nil {
-		return accounts.Account{}, &validation.StorageError{
-			Message: validation.NewResourceNotFoundByErrorMessage(id, "account", "id"),
+		return accounts.Account{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
 		}
 	}
 
@@ -115,8 +115,8 @@ func (r *AccountsRepository) Save(account *accounts.Account) error {
 	)
 
 	if err != nil {
-		return &validation.StorageError{
-			Message: validation.NewQueryErrorMessage("account", "saving", err),
+		return &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
 		}
 	}
 

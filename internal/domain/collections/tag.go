@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 )
 
 func NewCollectionTag(name, description string) (*CollectionTag, error) {
@@ -33,38 +34,38 @@ type CollectionTag struct {
 
 func (c *CollectionTag) Validate() error {
 	if validation.IsEmpty(c.Name) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("name"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("name"),
 		}
 	}
 
 	if validation.IsGreater(c.Name, 20) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 20, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 20, false),
 		}
 	}
 
 	if validation.IsLower(c.Name, 2) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 2, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 2, true),
 		}
 	}
 
 	if validation.IsEmpty(c.Description) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("description"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("description"),
 		}
 	}
 
 	if validation.IsGreater(c.Description, 32) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("description", 32, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("description", 32, false),
 		}
 	}
 
 	if validation.IsLower(c.Description, 8) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("description", 8, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("description", 8, true),
 		}
 	}
 

@@ -3,7 +3,7 @@ package accounts
 import (
 	"time"
 
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/cryptography"
 )
 
@@ -19,8 +19,8 @@ func NewAccountService(repo AccountRepository) *AccountService {
 func (s *AccountService) Authenticate(email, password string) (*Account, error) {
 	account, err := s.repo.FindByEmail(email)
 	if err != nil {
-		resourceNotFoundError := &validation.ResourceNotFoundError{
-			Message: validation.NewInvalidCredentialsErrorMessage(),
+		resourceNotFoundError := &errs.ResourceNotFoundError{
+			Message: errs.ServicesInvalidCredentialsErrorMessage(),
 		}
 
 		return nil, resourceNotFoundError
@@ -28,8 +28,8 @@ func (s *AccountService) Authenticate(email, password string) (*Account, error) 
 
 	isPasswordValid := cryptography.VerifyIfHashMatches(account.Password, password)
 	if !isPasswordValid {
-		credentialsNotMatchError := &validation.ServiceError{
-			Message: validation.NewInvalidCredentialsErrorMessage(),
+		credentialsNotMatchError := &errs.ServiceError{
+			Message: errs.ServicesInvalidCredentialsErrorMessage(),
 		}
 
 		return nil, credentialsNotMatchError
@@ -42,8 +42,8 @@ func (s *AccountService) Register(account *Account) error {
 	_, err := s.repo.FindByEmail(account.Email)
 
 	if err == nil {
-		return &validation.ServiceError{
-			Message: validation.NewUniqueValidationErrorMessage("Email"),
+		return &errs.ServiceError{
+			Message: errs.ServicesUniqueValidationErrorMessage("Email"),
 		}
 	}
 
@@ -54,44 +54,44 @@ func (s *AccountService) Register(account *Account) error {
 	return nil
 }
 
-func (s *AccountService) UpdateAnAccountRole(accountID, role string) (*Account, error) {
+func (s *AccountService) UpdateAnAccountRole(accountID, role string) error {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
-		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("Account"),
+		resourceNotFoundError := &errs.ServiceError{
+			Message: errs.ServicesResourceNotFoundErrorMessage("Account"),
 		}
 
-		return nil, resourceNotFoundError
+		return resourceNotFoundError
 	}
 
 	namedRole, err := account.validateRole(role)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if account.Role == namedRole {
-		notModifiedError := &validation.NotModifiedError{
-			Message: validation.NewNotModifiedErrorMessage(),
+		notModifiedError := &errs.NotModifiedError{
+			Message: errs.ServicesNotModifiedErrorMessage(),
 		}
 
-		return nil, notModifiedError
+		return notModifiedError
 	}
 
 	account.SetRole(namedRole)
 	account.Touch()
 
 	if err := s.repo.Save(&account); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &account, nil
+	return nil
 }
 
 func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
-		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("Account"),
+		resourceNotFoundError := &errs.ServiceError{
+			Message: errs.ServicesResourceNotFoundErrorMessage("Account"),
 		}
 
 		return resourceNotFoundError
@@ -110,8 +110,8 @@ func (s *AccountService) UploadAvatar(accountID, fileURL string) error {
 func (s *AccountService) DeleteAnAccount(accountID, managerID string) error {
 	account, err := s.repo.FindById(accountID)
 	if err != nil {
-		resourceNotFoundError := &validation.ServiceError{
-			Message: validation.NewResourceNotFoundErrorMessage("Account"),
+		resourceNotFoundError := &errs.ServiceError{
+			Message: errs.ServicesResourceNotFoundErrorMessage("Account"),
 		}
 
 		return resourceNotFoundError

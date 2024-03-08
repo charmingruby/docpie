@@ -1,11 +1,10 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -25,7 +24,7 @@ func MakeDeleteAnAccountEndpoint(logger *logrus.Logger, accountsService *account
 		}
 
 		if err := accountsService.DeleteAnAccount(accountToDeleteID, payload.AccountID); err != nil {
-			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
+			resourceNotFoundError, ok := err.(*errs.ResourceNotFoundError)
 			if ok {
 				logger.Error(resourceNotFoundError)
 				sendResponse[any](w, resourceNotFoundError.Error(), http.StatusNotFound, nil)
@@ -37,8 +36,8 @@ func MakeDeleteAnAccountEndpoint(logger *logrus.Logger, accountsService *account
 			return
 		}
 
-		logger.Info(fmt.Sprintf("account: '%s' deleted successfully by '%s'.", accountToDeleteID, payload.AccountID))
-		msg := "Account deleted successfully."
+		msg := DeleteResponse("Account")
+		logger.Info(msg)
 		sendResponse[any](w, msg, http.StatusOK, nil)
 	}
 }

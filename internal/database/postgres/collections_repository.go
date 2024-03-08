@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"github.com/charmingruby/upl/internal/domain/collections"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
@@ -10,39 +10,42 @@ import (
 type CollectionsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
+	logger     *logrus.Logger
 }
 
 func NewCollectionsRepository(logger *logrus.Logger, db *sqlx.DB) (*CollectionsRepository, error) {
 	sqlStmts := make(map[string]*sqlx.Stmt)
 
-	var errs []error
+	var es []error
 	for queryName, query := range collectionsQueries() {
 		stmt, err := db.Preparex(query)
 		if err != nil {
-			logger.Errorf("error preparing statement %s: %v", queryName, err)
-			errs = append(errs, err)
+			msg := errs.DatabaseQueryPreparationErrorMessage(queryName, err.Error())
+			logger.Error(msg)
+			es = append(es, err)
 		}
 
 		sqlStmts[queryName] = stmt
 	}
 
-	if len(errs) > 0 {
-		return nil, &validation.StorageError{
-			Message: validation.NewRepositoryStatementsPreparationErrorMessage("collections repository"),
+	if len(es) > 0 {
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseRepositoryNotAbleErrorMessage("collections"),
 		}
 	}
 
 	return &CollectionsRepository{
 		DB:         db,
 		statements: sqlStmts,
+		logger:     logger,
 	}, nil
 }
 
 func (r *CollectionsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	stmt, ok := r.statements[queryName]
 	if !ok {
-		return nil, &validation.StorageError{
-			Message: validation.NewQueryStatementPreparationErrorMessage(queryName),
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseQueryNotPreparedErrorMessage(queryName),
 		}
 	}
 
@@ -57,8 +60,8 @@ func (r *CollectionsRepository) Create(collection *collections.Collection) error
 
 	_, err = stmt.Exec(collection.ID, collection.Name, collection.Description, collection.Secret, collection.Tag, collection.TagID, collection.UploadsQuantity, collection.MembersQuantity, collection.CreatorID, collection.DeletedBy, collection.DeletedAt)
 	if err != nil {
-		return &validation.StorageError{
-			Message: validation.NewQueryErrorMessage("collection", "creating", err),
+		return &errs.DatabaseError{
+			Message: errs.DatabaseQueryErrorMessage("collection", "creating", err),
 		}
 	}
 
@@ -73,8 +76,8 @@ func (r *CollectionsRepository) FindByName(name string) (collections.Collection,
 
 	var collection collections.Collection
 	if err = stmt.Get(&collection, name); err != nil {
-		return collections.Collection{}, &validation.StorageError{
-			Message: validation.NewResourceNotFoundByErrorMessage(name, "collection", "name"),
+		return collections.Collection{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
 		}
 	}
 
@@ -101,8 +104,8 @@ func (r *CollectionsRepository) Save(collections *collections.Collection) error 
 	)
 
 	if err != nil {
-		return &validation.StorageError{
-			Message: validation.NewQueryErrorMessage("collection", "saving", err),
+		return &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
 		}
 	}
 

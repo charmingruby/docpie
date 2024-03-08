@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/charmingruby/upl/internal/domain/collections"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,8 +17,8 @@ func MakeCreateCollectionTagEndpoint(logger *logrus.Logger, collectionTagsServic
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := CreateCollectionTagRequest{}
 		if err := parseRequest(&request, r.Body); err != nil {
-			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorMessage([]string{"name", "description"}),
+			payloadError := &errs.EndpointError{
+				Message: errs.HTTPPayloadErrorMessage([]string{"name", "description"}),
 			}
 
 			logger.Error(payloadError.Error())
@@ -39,6 +39,8 @@ func MakeCreateCollectionTagEndpoint(logger *logrus.Logger, collectionTagsServic
 			return
 		}
 
-		sendResponse[any](w, NewCreateResponse(newTag.Name), http.StatusCreated, nil)
+		msg := CreatedResponse("Collection Tag")
+		logger.Info(msg)
+		sendResponse[any](w, msg, http.StatusCreated, nil)
 	}
 }

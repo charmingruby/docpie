@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/cryptography"
 )
 
@@ -63,61 +64,61 @@ type Account struct {
 
 func (a *Account) Validate() error {
 	if validation.IsEmpty(a.Name) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("name"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("name"),
 		}
 	}
 
 	if validation.IsLower(a.Name, 3) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 3, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 3, true),
 		}
 	}
 
 	if validation.IsGreater(a.Name, 16) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 3, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 3, true),
 		}
 	}
 
 	if validation.IsEmpty(a.LastName) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("last name"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("last name"),
 		}
 	}
 
 	if validation.IsLower(a.LastName, 3) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("last name", 3, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("last name", 3, true),
 		}
 	}
 
 	if validation.IsGreater(a.LastName, 32) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("last name", 32, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("last name", 32, false),
 		}
 	}
 
 	if validation.IsEmpty(a.Email) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("email"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("email"),
 		}
 	}
 
 	if validation.IsLower(a.Email, 6) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("email", 6, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("email", 6, true),
 		}
 	}
 
 	if validation.IsGreater(a.Email, 64) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("email", 64, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("email", 64, false),
 		}
 	}
 
 	if !validation.IsEmail(a.Email) {
-		return &validation.ValidationError{
+		return &errs.ValidationError{
 			Message: "invalid email format",
 		}
 	}
@@ -153,20 +154,20 @@ func (a *Account) validateRole(role string) (string, error) {
 
 func (a *Account) encryptPassword() error {
 	if validation.IsEmpty(a.Password) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("password"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("password"),
 		}
 	}
 
 	if validation.IsLower(a.Password, 8) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("password", 8, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("password", 8, true),
 		}
 	}
 
 	if validation.IsGreater(a.Password, 16) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("password", 16, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("password", 16, false),
 		}
 	}
 

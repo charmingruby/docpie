@@ -6,6 +6,7 @@ import (
 	"github.com/charmingruby/upl/helpers"
 	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/cryptography"
 )
 
@@ -51,50 +52,50 @@ type Collection struct {
 
 func (c *Collection) Validate() error {
 	if validation.IsEmpty(c.Name) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("name"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("name"),
 		}
 	}
 
 	if validation.IsGreater(c.Name, 20) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 20, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 20, false),
 		}
 	}
 
 	if validation.IsLower(c.Name, 2) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("name", 2, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("name", 2, true),
 		}
 	}
 
 	if validation.IsEmpty(c.Secret) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("secret"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("secret"),
 		}
 	}
 
 	if validation.IsGreater(c.Secret, 20) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("secret", 20, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("secret", 20, false),
 		}
 	}
 
 	if validation.IsLower(c.Secret, 10) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("secret", 10, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("secret", 10, true),
 		}
 	}
 
 	if validation.IsEmpty(c.CreatorID) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("creator_id"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("creator_id"),
 		}
 	}
 
 	if validation.IsEmpty(c.TagID) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("tag_id"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("tag_id"),
 		}
 	}
 
@@ -108,20 +109,20 @@ func (c *Collection) Touch() {
 
 func (c *Collection) encryptSecret() error {
 	if validation.IsEmpty(c.Secret) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("secret"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("secret"),
 		}
 	}
 
 	if validation.IsLower(c.Secret, 8) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("secret", 8, true),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("secret", 8, true),
 		}
 	}
 
 	if validation.IsGreater(c.Secret, 16) {
-		return &validation.ValidationError{
-			Message: validation.NewFieldLengthErrorMessage("secret", 16, false),
+		return &errs.ValidationError{
+			Message: errs.EntitiesFieldLengthErrorMessage("secret", 16, false),
 		}
 	}
 

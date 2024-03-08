@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 )
 
 func NewFile(name, mimetype string, size int64, validMimetypes []string, maxSizeInBytes int64) (*File, error) {
@@ -37,16 +37,16 @@ func (f *File) Validate(validMimetypes []string, maxSizeInBytes int64) error {
 	}
 
 	if !matchAMimetype {
-		mimetypeError := &validation.FileError{
-			Message: validation.NewInvalidMimetypeErrorMessage(f.Mimetype, validMimetypes),
+		mimetypeError := &errs.FileError{
+			Message: errs.FilesInvalidMimetypeErrorMessage(f.Mimetype, validMimetypes),
 		}
 
 		return mimetypeError
 	}
 
 	if f.Size > maxSizeInBytes {
-		sizeError := &validation.FileError{
-			Message: validation.NewFileReachesMaximumSizeErrorMessage(f.Size, maxSizeInBytes),
+		sizeError := &errs.FileError{
+			Message: errs.FilesReachesMaximumSizeErrorMessage(f.Size, maxSizeInBytes),
 		}
 
 		return sizeError

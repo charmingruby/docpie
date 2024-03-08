@@ -1,6 +1,6 @@
 package collections
 
-import "github.com/charmingruby/upl/internal/validation"
+import "github.com/charmingruby/upl/internal/validation/errs"
 
 type CollectionTagService struct {
 	repo CollectionTagsRepository
@@ -15,8 +15,8 @@ func NewCollectionTagsService(repo CollectionTagsRepository) *CollectionTagServi
 func (s *CollectionTagService) Create(tag *CollectionTag) error {
 	_, err := s.repo.FindByName(tag.Name)
 	if err == nil {
-		return &validation.ServiceError{
-			Message: validation.NewUniqueValidationErrorMessage("Name"),
+		return &errs.ServiceError{
+			Message: errs.ServicesUniqueValidationErrorMessage("Name"),
 		}
 	}
 

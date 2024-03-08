@@ -1,11 +1,11 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/charmingruby/upl/internal/domain/collections"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/sirupsen/logrus"
 )
@@ -21,8 +21,8 @@ func MakeCreateCollectionEndpoint(logger *logrus.Logger, collectionsService *col
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := CreateCollectionRequest{}
 		if err := parseRequest[CreateCollectionRequest](&request, r.Body); err != nil {
-			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorMessage([]string{"name", "secret", "tag"}),
+			payloadError := &errs.EndpointError{
+				Message: errs.HTTPPayloadErrorMessage([]string{"name", "secret", "tag"}),
 			}
 
 			logger.Error(payloadError)
@@ -57,8 +57,8 @@ func MakeCreateCollectionEndpoint(logger *logrus.Logger, collectionsService *col
 				emptyFields = append(emptyFields, "tag_id")
 			}
 
-			emptyPayloadFieldsError := &validation.EndpointError{
-				Message: validation.NewEmptyPayloadFieldsErrorMessage(emptyFields),
+			emptyPayloadFieldsError := &errs.EndpointError{
+				Message: errs.HTTPEmptyPayloadFieldsErrorMessage(emptyFields),
 			}
 
 			logger.Error(emptyPayloadFieldsError)
@@ -78,8 +78,8 @@ func MakeCreateCollectionEndpoint(logger *logrus.Logger, collectionsService *col
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return
 		}
-
-		logger.Info(fmt.Sprintf("%s created collection '%s'", collection.CreatorID, collection.Name))
-		sendResponse[any](w, NewCreateResponse("Collection"), http.StatusCreated, nil)
+		msg := CreatedResponse("Collection")
+		logger.Info(msg)
+		sendResponse[any](w, msg, http.StatusCreated, nil)
 	}
 }

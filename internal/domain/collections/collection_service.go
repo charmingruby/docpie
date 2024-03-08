@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 )
 
 type CollectionService struct {
@@ -26,8 +26,8 @@ func NewCollectionService(repo CollectionsRepository, tagsRepo CollectionTagsRep
 func (s *CollectionService) Create(collection *Collection) error {
 	owner, err := s.accountsRepo.FindById(collection.CreatorID)
 	if err != nil {
-		resourceNotFoundError := &validation.ResourceNotFoundError{
-			Message: validation.NewResourceNotFoundErrorMessage("Account"),
+		resourceNotFoundError := &errs.ResourceNotFoundError{
+			Message: errs.ServicesResourceNotFoundErrorMessage("Account"),
 		}
 
 		return resourceNotFoundError
@@ -43,16 +43,16 @@ func (s *CollectionService) Create(collection *Collection) error {
 
 	_, err = s.repo.FindByName(collection.Name)
 	if err == nil {
-		return &validation.ServiceError{
-			Message: validation.NewUniqueValidationErrorMessage(collection.Name),
+		return &errs.ServiceError{
+			Message: errs.ServicesUniqueValidationErrorMessage(collection.Name),
 		}
 	}
 
 	tag, err := s.tagsRepo.FindByID(collection.TagID)
 
 	if err != nil {
-		resourceNotFoundError := &validation.ResourceNotFoundError{
-			Message: validation.NewResourceNotFoundErrorMessage("Collection Tag"),
+		resourceNotFoundError := &errs.ResourceNotFoundError{
+			Message: errs.ServicesResourceNotFoundErrorMessage("Collection Tag"),
 		}
 
 		return resourceNotFoundError

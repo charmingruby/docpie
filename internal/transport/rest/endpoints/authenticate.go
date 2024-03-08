@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/sirupsen/logrus"
 )
@@ -23,8 +24,8 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := &AuthenticateRequest{}
 		if err := parseRequest[AuthenticateRequest](request, r.Body); err != nil {
-			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorMessage([]string{"email", "password"}),
+			payloadError := &errs.EndpointError{
+				Message: errs.HTTPPayloadErrorMessage([]string{"email", "password"}),
 			}
 
 			logger.Error(payloadError)
@@ -46,8 +47,8 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 				emptyFields = append(emptyFields, "password")
 			}
 
-			emptyPayloadFieldsError := &validation.EndpointError{
-				Message: validation.NewEmptyPayloadFieldsErrorMessage(emptyFields),
+			emptyPayloadFieldsError := &errs.EndpointError{
+				Message: errs.HTTPEmptyPayloadFieldsErrorMessage(emptyFields),
 			}
 
 			logger.Error(emptyPayloadFieldsError)
@@ -57,7 +58,7 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 
 		account, err := accountsService.Authenticate(request.Email, request.Password)
 		if err != nil {
-			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
+			resourceNotFoundError, ok := err.(*errs.ResourceNotFoundError)
 			if ok {
 				logger.Error(resourceNotFoundError)
 				sendResponse[any](w, resourceNotFoundError.Error(), http.StatusNotFound, nil)
@@ -81,8 +82,8 @@ func MakeAuthenticateEndpoint(logger *logrus.Logger, accountsService *accounts.A
 			Token: t,
 		}
 
-		logger.Info(fmt.Sprintf("'%s' authenticated successfully", request.Email))
-
-		sendResponse[AuthenticateResponse](w, "Authenticated successfully.", http.StatusOK, body)
+		msg := "Authenticated successfully."
+		logger.Info(msg)
+		sendResponse[AuthenticateResponse](w, msg, http.StatusOK, body)
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 )
 
 const (
@@ -52,14 +53,14 @@ func (m *CollectionMember) Validate() error {
 	m.Role = namedRole
 
 	if validation.IsEmpty(m.AccountID) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("account_id"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("account_id"),
 		}
 	}
 
 	if validation.IsEmpty(m.CollectionID) {
-		return &validation.ValidationError{
-			Message: validation.NewRequiredFieldErrorMessage("collections_id"),
+		return &errs.ValidationError{
+			Message: errs.EntitieisRequiredFieldErrorMessage("collections_id"),
 		}
 	}
 

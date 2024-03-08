@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/charmingruby/upl/pkg/cloudflare"
 	"github.com/charmingruby/upl/pkg/files"
 	"github.com/charmingruby/upl/pkg/token"
@@ -29,8 +29,8 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 		multipartFormKey := "avatar"
 		file, fileHeader, err := r.FormFile(multipartFormKey)
 		if err != nil {
-			noFileFoundError := &validation.FileError{
-				Message: validation.NewNoFileErrorMessage(multipartFormKey),
+			noFileFoundError := &errs.FileError{
+				Message: errs.FilesNoFileErrorMessage(multipartFormKey),
 			}
 
 			logger.Error(noFileFoundError.Error())
@@ -72,7 +72,7 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 				return
 			}
 
-			resourceNotFoundError, ok := err.(*validation.ResourceNotFoundError)
+			resourceNotFoundError, ok := err.(*errs.ResourceNotFoundError)
 			if ok {
 				logger.Error(resourceNotFoundError)
 				sendResponse[any](w, resourceNotFoundError.Error(), http.StatusNotFound, nil)
@@ -84,7 +84,7 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 			return
 		}
 
-		msg := "Avatar uploaded successfully."
+		msg := ModifiedResponse("Account", "avatar")
 		logger.Info(msg)
 		sendResponse[any](w, msg, http.StatusOK, nil)
 	}

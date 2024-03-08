@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"github.com/charmingruby/upl/internal/domain/collections"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
@@ -15,20 +15,21 @@ type CollectionTagsRepository struct {
 func NewCollectionTagsRepository(logger *logrus.Logger, db *sqlx.DB) (*CollectionTagsRepository, error) {
 	sqlStmts := make(map[string]*sqlx.Stmt)
 
-	var errs []error
+	var es []error
 	for queryName, query := range collectionTagsQueries() {
 		stmt, err := db.Preparex(query)
 		if err != nil {
-			logger.Errorf("error preparing statement %s: %v", queryName, err)
-			errs = append(errs, err)
+			msg := errs.DatabaseQueryPreparationErrorMessage(queryName, err.Error())
+			logger.Error(msg)
+			es = append(es, err)
 		}
 
 		sqlStmts[queryName] = stmt
 	}
 
-	if len(errs) > 0 {
-		return nil, &validation.StorageError{
-			Message: validation.NewRepositoryStatementsPreparationErrorMessage("collection tags repository"),
+	if len(es) > 0 {
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseRepositoryNotAbleErrorMessage("Collection Tags"),
 		}
 	}
 
@@ -41,8 +42,8 @@ func NewCollectionTagsRepository(logger *logrus.Logger, db *sqlx.DB) (*Collectio
 func (r *CollectionTagsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	stmt, ok := r.statements[queryName]
 	if !ok {
-		return nil, &validation.StorageError{
-			Message: validation.NewQueryStatementPreparationErrorMessage(queryName),
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseQueryNotPreparedErrorMessage(queryName),
 		}
 	}
 
@@ -57,8 +58,8 @@ func (r *CollectionTagsRepository) Create(tag *collections.CollectionTag) error 
 
 	_, err = stmt.Exec(tag.ID, tag.Name, tag.Description)
 	if err != nil {
-		return &validation.StorageError{
-			Message: validation.NewQueryErrorMessage("collection tag", "creating", err),
+		return &errs.DatabaseError{
+			Message: errs.DatabaseQueryErrorMessage("collection tag", "creating", err),
 		}
 	}
 
@@ -73,8 +74,8 @@ func (r *CollectionTagsRepository) FindByName(name string) (collections.Collecti
 
 	var tag collections.CollectionTag
 	if err = stmt.Get(&tag, name); err != nil {
-		return collections.CollectionTag{}, &validation.StorageError{
-			Message: validation.NewResourceNotFoundByErrorMessage(name, "collection tag", "name"),
+		return collections.CollectionTag{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection Tag"),
 		}
 	}
 
@@ -90,8 +91,8 @@ func (r *CollectionTagsRepository) FindByID(id string) (collections.CollectionTa
 	var tag collections.CollectionTag
 	if err = stmt.Get(&tag, id); err != nil {
 
-		return collections.CollectionTag{}, &validation.StorageError{
-			Message: validation.NewResourceNotFoundByErrorMessage(id, "collection tag", "id"),
+		return collections.CollectionTag{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection Tag"),
 		}
 	}
 

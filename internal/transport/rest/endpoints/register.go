@@ -1,11 +1,10 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
-	"github.com/charmingruby/upl/internal/validation"
+	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,8 +19,8 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 	return func(w http.ResponseWriter, r *http.Request) {
 		request := &RegisterRequest{}
 		if err := parseRequest[RegisterRequest](request, r.Body); err != nil {
-			payloadError := &validation.EndpointError{
-				Message: validation.NewPayloadErrorMessage([]string{"name", "last_name", "email", "password"}),
+			payloadError := &errs.EndpointError{
+				Message: errs.HTTPPayloadErrorMessage([]string{"name", "last_name", "email", "password"}),
 			}
 
 			logger.Error(payloadError.Error())
@@ -42,8 +41,8 @@ func MakeRegisterEndpoint(logger *logrus.Logger, accountService *accounts.Accoun
 			return
 		}
 
-		msg := NewCreateResponse("Account")
-		logger.Info(fmt.Sprintf("Account: '%s' created successfully.", newAccount.Email))
+		msg := CreatedResponse("Account")
+		logger.Info(msg)
 		sendResponse[any](
 			w,
 			msg,
