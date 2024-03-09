@@ -84,6 +84,22 @@ func (r *CollectionsRepository) FindByName(name string) (collections.Collection,
 	return collection, nil
 }
 
+func (r *CollectionsRepository) FindByID(id string) (collections.Collection, error) {
+	stmt, err := r.statement(findCollectionByID)
+	if err != nil {
+		return collections.Collection{}, err
+	}
+
+	var collection collections.Collection
+	if err = stmt.Get(&collection, id); err != nil {
+		return collections.Collection{}, &errs.DatabaseError{
+			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
+		}
+	}
+
+	return collection, nil
+}
+
 func (r *CollectionsRepository) Save(collections *collections.Collection) error {
 	stmt, err := r.statement(saveCollection)
 	if err != nil {

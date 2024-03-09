@@ -1,6 +1,9 @@
 package collections
 
 import (
+	"fmt"
+
+	"github.com/charmingruby/upl/internal/domain"
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation/errs"
 )
@@ -31,15 +34,9 @@ func (s *CollectionService) Create(collection *Collection) error {
 		return resourceNotFoundError
 	}
 
-	if owner.CollectionsCreatedQuantity > 3 {
+	if owner.CollectionsCreatedQuantity > domain.MaxMemberAccountCreatedCollections {
 		return &errs.ServiceError{
-			Message: "Members can only create 3 collections",
-		}
-	}
-
-	if owner.CollectionsMemberQuantity > 10 {
-		return &errs.ServiceError{
-			Message: "Members can only be member of 10 collections",
+			Message: fmt.Sprintf("Members can only create %d collections", domain.MaxMemberAccountCreatedCollections),
 		}
 	}
 
@@ -76,6 +73,9 @@ func (s *CollectionService) Create(collection *Collection) error {
 
 	collection.Touch()
 	collection.MembersQuantity += 1
+	if err := s.repo.Save(collection); err != nil {
+		return err
+	}
 
 	owner.CollectionsCreatedQuantity += 1
 	if err := s.accountsRepo.Save(&owner); err != nil {

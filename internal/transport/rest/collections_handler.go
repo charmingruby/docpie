@@ -40,7 +40,7 @@ func NewCollectionsHandler(
 func (h *CollectionsHandler) Register(router *mux.Router) {
 	createCollectionTagEndpoint := endpoints.MakeCreateCollectionTagEndpoint(h.logger, h.tagsService)
 	createCollectionEndpoint := endpoints.MakeCreateCollectionEndpoint(h.logger, h.collectionsService, h.tagsService)
-	createCollectionMemberEndpoint := endpoints.MakeCreateCollectionMemberEndpoint(h.logger, h.membersService)
+	createCollectionMemberEndpoint := endpoints.MakeAddMemberToACollectionEndpoint(h.logger, h.membersService)
 	createUploadEndpoint := endpoints.MakeCreateUploadEndpoint(h.logger, h.uploadsService)
 
 	// Manager
