@@ -32,13 +32,13 @@ func (s *CollectionService) Create(collection *Collection) error {
 	}
 
 	if owner.CollectionsCreatedQuantity > 3 {
-		return &errs.ValidationError{
+		return &errs.ServiceError{
 			Message: "Members can only create 3 collections",
 		}
 	}
 
 	if owner.CollectionsMemberQuantity > 10 {
-		return &errs.ValidationError{
+		return &errs.ServiceError{
 			Message: "Members can only be member of 10 collections",
 		}
 	}
@@ -66,7 +66,7 @@ func (s *CollectionService) Create(collection *Collection) error {
 		return err
 	}
 
-	member, err := NewCollectionMember("manager", owner.ID, collection.ID)
+	member, err := NewCollectionMember(owner.ID, collection.ID)
 	if err != nil {
 		return err
 	}

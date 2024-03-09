@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ProtectedRouteByRole(logger *logrus.Logger, role string, next http.HandlerFunc) http.HandlerFunc {
+func (m *Middleware) ProtectedRouteByRole(logger *logrus.Logger, role string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		extractedToken := extractTokenFromRequest(r)
 

@@ -8,6 +8,7 @@ import (
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/domain/collections"
 	"github.com/charmingruby/upl/internal/transport/rest"
+	"github.com/charmingruby/upl/internal/transport/rest/middlewares"
 	"github.com/charmingruby/upl/pkg/database/postgresql"
 	"github.com/charmingruby/upl/pkg/logger"
 	"github.com/gorilla/mux"
@@ -74,19 +75,20 @@ func main() {
 	accountsService := accounts.NewAccountService(accountsRepository)
 	collectionTagsService := collections.NewCollectionTagsService(collectionTagsRepository)
 	collectionsService := collections.NewCollectionService(collectionsRepository, collectionTagsRepository, collectionMembersRepository, accountsRepository)
+	collectionMembersService := collections.NewCollectionsMembersService(collectionMembersRepository, accountsRepository)
 	uploadsService := collections.NewUploadService(uploadsRepository, collectionsRepository, accountsRepository)
 	logger.Info("Services initialized.")
 
 	// Initialize REST server
 	logger.Info("Initializing HTTP server...")
 	router := mux.NewRouter().StrictSlash(true)
+	middlewares := middlewares.NewMiddleware(cfg.Logger, collectionMembersRepository)
 
 	// Initialize the routes
 	logger.Info("Registering routes...")
 	rest.NewPingHandler().Register(router)
-	rest.NewAccountsHandler(cfg.Logger, accountsService).Register(router)
-	rest.NewCollectionsHandler(cfg.Logger, collectionsService, collectionTagsService).Register(router)
-	rest.NewUploadsHandler(cfg.Logger, uploadsService, collectionMembersRepository).Register(router)
+	rest.NewAccountsHandler(cfg.Logger, middlewares, accountsService).Register(router)
+	rest.NewCollectionsHandler(cfg.Logger, middlewares, collectionsService, collectionTagsService, collectionMembersService, uploadsService).Register(router)
 	logger.Info("Routes registered.")
 
 	// Initialize the server

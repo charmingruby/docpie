@@ -11,23 +11,48 @@ import (
 )
 
 type CollectionsHandler struct {
-	logger               *logrus.Logger
-	collectionTagService *collections.CollectionTagService
-	collectionsService   *collections.CollectionService
+	logger             *logrus.Logger
+	mw                 *middlewares.Middleware
+	tagsService        *collections.CollectionTagService
+	collectionsService *collections.CollectionService
+	membersService     *collections.CollectionMembersService
+	uploadsService     *collections.UploadService
 }
 
-func NewCollectionsHandler(logger *logrus.Logger, collectionService *collections.CollectionService, collectionTagService *collections.CollectionTagService) *CollectionsHandler {
+func NewCollectionsHandler(
+	logger *logrus.Logger,
+	mw *middlewares.Middleware,
+	collectionService *collections.CollectionService,
+	tagsService *collections.CollectionTagService,
+	membersService *collections.CollectionMembersService,
+	uploadsService *collections.UploadService,
+) *CollectionsHandler {
 	return &CollectionsHandler{
-		logger:               logger,
-		collectionTagService: collectionTagService,
-		collectionsService:   collectionService,
+		logger:             logger,
+		mw:                 mw,
+		tagsService:        tagsService,
+		collectionsService: collectionService,
+		membersService:     membersService,
+		uploadsService:     uploadsService,
 	}
 }
 
 func (h *CollectionsHandler) Register(router *mux.Router) {
-	createCollectionTagEndpoint := endpoints.MakeCreateCollectionTagEndpoint(h.logger, h.collectionTagService)
-	createCollectionEndpoint := endpoints.MakeCreateCollectionEndpoint(h.logger, h.collectionsService, h.collectionTagService)
+	createCollectionTagEndpoint := endpoints.MakeCreateCollectionTagEndpoint(h.logger, h.tagsService)
+	createCollectionEndpoint := endpoints.MakeCreateCollectionEndpoint(h.logger, h.collectionsService, h.tagsService)
+	createCollectionMemberEndpoint := endpoints.MakeCreateCollectionMemberEndpoint(h.logger, h.membersService)
+	createUploadEndpoint := endpoints.MakeCreateUploadEndpoint(h.logger, h.uploadsService)
 
-	router.HandleFunc("/collections/tags", middlewares.ProtectedRouteByRole(h.logger, "manager", createCollectionTagEndpoint)).Methods(http.MethodPost)
-	router.HandleFunc("/collections", middlewares.ProtectedRoute(h.logger, createCollectionEndpoint)).Methods(http.MethodPost)
+	// Manager
+	router.HandleFunc("/collections/tags", h.mw.ProtectedRouteByRole(h.logger, "manager", createCollectionTagEndpoint)).
+		Methods(http.MethodPost)
+
+	// Members
+	router.HandleFunc("/collections", h.mw.ProtectedRoute(h.logger, createCollectionEndpoint)).
+		Methods(http.MethodPost)
+	router.HandleFunc("/collections/{id}/members", createCollectionMemberEndpoint).
+		Methods(http.MethodPost)
+	router.HandleFunc("/collections/{id}/upload", createUploadEndpoint).
+		Methods(http.MethodPost)
+
 }

@@ -14,7 +14,7 @@ const (
 	defaultRole = "member"
 )
 
-func NewCollectionMember(role, accountID, collectionID string) (*CollectionMember, error) {
+func NewCollectionMember(accountID, collectionID string) (*CollectionMember, error) {
 	member := CollectionMember{
 		ID:              core.NewId(),
 		Role:            defaultRole,

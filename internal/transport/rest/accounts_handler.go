@@ -13,11 +13,13 @@ import (
 type AccountsHandler struct {
 	accountService *accounts.AccountService
 	logger         *logrus.Logger
+	mw             *middlewares.Middleware
 }
 
-func NewAccountsHandler(logger *logrus.Logger, accountService *accounts.AccountService) *AccountsHandler {
+func NewAccountsHandler(logger *logrus.Logger, mw *middlewares.Middleware, accountService *accounts.AccountService) *AccountsHandler {
 	return &AccountsHandler{
 		accountService: accountService,
+		mw:             mw,
 		logger:         logger,
 	}
 }
@@ -31,7 +33,7 @@ func (h *AccountsHandler) Register(router *mux.Router) {
 
 	router.HandleFunc("/register", registerEndpoint).Methods(http.MethodPost)
 	router.HandleFunc("/authenticate", authenticateEndpoint).Methods(http.MethodPost)
-	router.HandleFunc("/accounts/{id}/roles", middlewares.ProtectedRouteByRole(h.logger, "manager", updateAnAccountRoleEndpoint)).Methods(http.MethodPatch)
-	router.HandleFunc("/me/avatar", middlewares.ProtectedRoute(h.logger, uploadAvatarEndpoint)).Methods(http.MethodPatch)
-	router.HandleFunc("/accounts/{id}", middlewares.ProtectedRouteByRole(h.logger, "manager", deleteAnAccountEndpoint)).Methods(http.MethodDelete)
+	router.HandleFunc("/accounts/{id}/roles", h.mw.ProtectedRouteByRole(h.logger, "manager", updateAnAccountRoleEndpoint)).Methods(http.MethodPatch)
+	router.HandleFunc("/me/avatar", h.mw.ProtectedRoute(h.logger, uploadAvatarEndpoint)).Methods(http.MethodPatch)
+	router.HandleFunc("/accounts/{id}", h.mw.ProtectedRouteByRole(h.logger, "manager", deleteAnAccountEndpoint)).Methods(http.MethodDelete)
 }

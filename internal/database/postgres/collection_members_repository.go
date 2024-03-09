@@ -81,3 +81,19 @@ func (r *CollectionMembersRepository) FindMemberInCollection(accountID, collecti
 
 	return member, nil
 }
+
+func (r *CollectionMembersRepository) FetchByCollectionID(collectionID string) ([]collections.CollectionMember, error) {
+	stmt, err := r.statement(fetchMembersByCollectionID)
+	if err != nil {
+		return nil, err
+	}
+
+	var members []collections.CollectionMember
+	if err := stmt.Select(&members, collectionID); err != nil {
+		return nil, &errs.DatabaseError{
+			Message: err.Error(),
+		}
+	}
+
+	return members, nil
+}
