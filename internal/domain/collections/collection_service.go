@@ -1,8 +1,6 @@
 package collections
 
 import (
-	"errors"
-
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation/errs"
 )
@@ -34,11 +32,15 @@ func (s *CollectionService) Create(collection *Collection) error {
 	}
 
 	if owner.CollectionsCreatedQuantity > 3 {
-		return errors.New("members can only create 3 collections")
+		return &errs.ValidationError{
+			Message: "Members can only create 3 collections",
+		}
 	}
 
 	if owner.CollectionsMemberQuantity > 10 {
-		return errors.New("members can only be mmember of 10 collections")
+		return &errs.ValidationError{
+			Message: "Members can only be member of 10 collections",
+		}
 	}
 
 	_, err = s.repo.FindByName(collection.Name)
@@ -72,7 +74,6 @@ func (s *CollectionService) Create(collection *Collection) error {
 		return err
 	}
 
-	// Increments the collections members
 	collection.Touch()
 	collection.MembersQuantity += 1
 

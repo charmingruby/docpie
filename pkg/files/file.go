@@ -67,3 +67,8 @@ func GetFileData(filename string) (string, string, error) {
 
 	return file, mimetype, nil
 }
+
+func MBToBytes(value int) int {
+	MBInBytes := 1000000
+	return MBInBytes * value
+}

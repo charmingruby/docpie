@@ -16,14 +16,14 @@ const (
 
 func NewCollectionMember(role, accountID, collectionID string) (*CollectionMember, error) {
 	member := CollectionMember{
-		ID:             core.NewId(),
-		Role:           defaultRole,
-		UploadQuantity: 0,
-		AccountID:      accountID,
-		CollectionID:   collectionID,
-		JoinedAt:       time.Now(),
-		UpdatedAt:      nil,
-		LeftAt:         nil,
+		ID:              core.NewId(),
+		Role:            defaultRole,
+		UploadsQuantity: 0,
+		AccountID:       accountID,
+		CollectionID:    collectionID,
+		JoinedAt:        time.Now(),
+		UpdatedAt:       nil,
+		LeftAt:          nil,
 	}
 
 	if err := member.Validate(); err != nil {
@@ -34,14 +34,14 @@ func NewCollectionMember(role, accountID, collectionID string) (*CollectionMembe
 }
 
 type CollectionMember struct {
-	ID             string     `json:"id"`
-	Role           string     `db:"role" json:"role"`
-	UploadQuantity int        `db:"upload_quantity" json:"upload_quantity"`
-	AccountID      string     `json:"account_id"`
-	CollectionID   string     `json:"collection_id"`
-	JoinedAt       time.Time  `json:"joined_at"`
-	UpdatedAt      *time.Time `json:"updated_at"`
-	LeftAt         *time.Time `json:"left_at"`
+	ID              string     `db:"id" json:"id"`
+	Role            string     `db:"role" json:"role"`
+	UploadsQuantity int        `db:"uploads_quantity" json:"uploads_quantity"`
+	AccountID       string     `db:"account_id" json:"account_id"`
+	CollectionID    string     `db:"collection_id" json:"collection_id"`
+	JoinedAt        time.Time  `db:"joined_at" json:"joined_at"`
+	UpdatedAt       *time.Time `db:"updated_at" json:"updated_at"`
+	LeftAt          *time.Time `db:"left_at" json:"left_at"`
 }
 
 func (m *CollectionMember) Validate() error {

@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS collection_members (
     id UUID PRIMARY KEY NOT NULL,
     
     role varchar NOT NULL,
-    upload_quantity integer NOT NULL,
+    uploads_quantity integer NOT NULL,
 
     account_id UUID REFERENCES accounts (id) NOT NULL,
     collection_id UUID REFERENCES collections (id) NOT NULL,
@@ -79,17 +79,6 @@ CREATE TABLE IF NOT EXISTS uploads (
     
     uploaded_at timestamp DEFAULT now() NOT NULL,
     deleted_at timestamp
-);
-
-CREATE TABLE IF NOT EXISTS notifications (
-    id UUID PRIMARY KEY NOT NULL,
-
-    context varchar NOT NULL,
-    message_id varchar NOT NULL,
-
-    recipient_id UUID REFERENCES accounts (id) NOT NULL,
-
-    sent_at timestamp DEFAULT now() NOT NULL
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS accounts_email_uindex

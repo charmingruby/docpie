@@ -24,43 +24,27 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 			return
 		}
 
-		// Receive file from multipart form
-		r.ParseMultipartForm(32 << 20)
-		multipartFormKey := "avatar"
-		file, fileHeader, err := r.FormFile(multipartFormKey)
-		if err != nil {
-			noFileFoundError := &errs.FileError{
-				Message: errs.FilesNoFileErrorMessage(multipartFormKey),
-			}
-
-			logger.Error(noFileFoundError.Error())
-			sendResponse[any](w, noFileFoundError.Error(), http.StatusBadRequest, nil)
-			return
-		}
-
-		// Validate file
-		filename, mimetype, err := files.GetFileData(fileHeader.Filename)
+		file, entity, err := handleMultipartFormFile(
+			r,
+			"avatar",
+			32,
+			int64(files.MBToBytes(10)),
+			[]string{"jpg", "png", "jpeg"},
+		)
 		if err != nil {
 			logger.Error(err.Error())
 			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
 			return
 		}
 
-		validMimetypes := []string{"jpg", "png", "jpeg"}
-		maxSizeInBytes := 10000000 // 10 mb
-		fileEntity, err := files.NewFile(filename, mimetype, fileHeader.Size, validMimetypes, int64(maxSizeInBytes))
-		if err != nil {
-			logger.Error(err.Error())
-			sendResponse[any](w, err.Error(), http.StatusBadRequest, nil)
-			return
-		}
-
-		fileURL := fmt.Sprintf("%s-%d.%s", payload.AccountID, time.Now().Unix(), fileEntity.Mimetype)
+		fileURL := fmt.Sprintf("%s-%d.%s", payload.AccountID, time.Now().Unix(), entity.Mimetype)
 
 		// Register file on Bucket
 		cl := cloudflare.New(logger)
 		if err = cl.UploadToBucket(file, fileURL); err != nil {
 			logger.Error(err)
+			sendResponse[any](w, "Unable to update avatar on Cloudflare", http.StatusInternalServerError, nil)
+			return
 		}
 
 		// Update account

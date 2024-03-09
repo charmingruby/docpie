@@ -61,6 +61,12 @@ func main() {
 		logger.Errorf("Error initializing collection members postgres repository: %s", err.Error())
 		os.Exit(1)
 	}
+
+	uploadsRepository, err := postgres.NewUploadsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	if err != nil {
+		logger.Errorf("Error initializing uploads postgres repository: %s", err.Error())
+		os.Exit(1)
+	}
 	logger.Info("Repositories initialized.")
 
 	// Initialize services
@@ -68,6 +74,7 @@ func main() {
 	accountsService := accounts.NewAccountService(accountsRepository)
 	collectionTagsService := collections.NewCollectionTagsService(collectionTagsRepository)
 	collectionsService := collections.NewCollectionService(collectionsRepository, collectionTagsRepository, collectionMembersRepository, accountsRepository)
+	uploadsService := collections.NewUploadService(uploadsRepository, collectionsRepository, accountsRepository)
 	logger.Info("Services initialized.")
 
 	// Initialize REST server
@@ -76,9 +83,10 @@ func main() {
 
 	// Initialize the routes
 	logger.Info("Registering routes...")
+	rest.NewPingHandler().Register(router)
 	rest.NewAccountsHandler(cfg.Logger, accountsService).Register(router)
 	rest.NewCollectionsHandler(cfg.Logger, collectionsService, collectionTagsService).Register(router)
-	rest.NewPingHandler().Register(router)
+	rest.NewUploadsHandler(cfg.Logger, uploadsService, collectionMembersRepository).Register(router)
 	logger.Info("Routes registered.")
 
 	// Initialize the server

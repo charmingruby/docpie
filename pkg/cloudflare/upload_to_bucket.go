@@ -2,7 +2,6 @@ package cloudflare
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -18,8 +17,6 @@ func (c *Cloudflare) UploadToBucket(file io.Reader, key string) error {
 		Body:   file,
 	})
 	if err != nil {
-		c.logger.Info(fmt.Sprintf("Error uploading Cloudflare file: %v", err))
-
 		return err
 	}
 

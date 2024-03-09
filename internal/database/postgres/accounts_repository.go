@@ -17,19 +17,22 @@ type AccountsRepository struct {
 func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsRepository, error) {
 	sqlStmts := make(map[string]*sqlx.Stmt)
 
-	var errs []error
+	var es []error
 	for queryName, query := range accountQueries() {
 		stmt, err := db.Preparex(query)
 		if err != nil {
-			logger.Errorf("error preparing statement %s: %v", queryName, err)
-			errs = append(errs, err)
+			msg := errs.DatabaseQueryPreparationErrorMessage(queryName, err.Error())
+			logger.Error(msg)
+			es = append(es, err)
 		}
 
 		sqlStmts[queryName] = stmt
 	}
 
-	if len(errs) > 0 {
-		return nil, fmt.Errorf("accounts repository wasn't able to build all the statements")
+	if len(es) > 0 {
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseRepositoryNotAbleErrorMessage("Accounts"),
+		}
 	}
 
 	return &AccountsRepository{
@@ -41,7 +44,9 @@ func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsReposit
 func (r *AccountsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	stmt, ok := r.statements[queryName]
 	if !ok {
-		return nil, fmt.Errorf("prepared statement '%s' not found", queryName)
+		return nil, &errs.DatabaseError{
+			Message: errs.DatabaseQueryNotPreparedErrorMessage(queryName),
+		}
 	}
 
 	return stmt, nil

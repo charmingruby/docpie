@@ -34,7 +34,7 @@ func FilesInvalidMimetypeErrorMessage(mimetypeUnmatched string, validMimetypes [
 
 	for idx, mimetype := range validMimetypes {
 		if idx+1 == len(mimetypeUnmatched) {
-			msg += fmt.Sprintf("or .%s.", mimetype)
+			msg += fmt.Sprintf("or .%s", mimetype)
 			continue
 		}
 
@@ -72,14 +72,14 @@ func HTTPPayloadErrorMessage(requiredFields []string) string {
 
 	statementConnector := helpers.If[string](len(requiredFields) <= 1, "is", "are")
 
-	return fmt.Sprintf("Invalid payload, %s %s required.", fieldsStr, statementConnector)
+	return fmt.Sprintf("Invalid payload, %s %s required", fieldsStr, statementConnector)
 }
 
 func HTTPEmptyPayloadFieldsErrorMessage(fields []string) string {
 	var fieldsStr string
 
 	if len(fields) == 1 {
-		return fmt.Sprintf("Invalid payload, %s cannot be blank.", fields[0])
+		return fmt.Sprintf("Invalid payload, %s cannot be blank", fields[0])
 	}
 
 	for idx, field := range fields {
@@ -94,7 +94,7 @@ func HTTPEmptyPayloadFieldsErrorMessage(fields []string) string {
 		}
 	}
 
-	return fmt.Sprintf("Invalid payload, %s cannot be blank.", fieldsStr)
+	return fmt.Sprintf("Invalid payload, %s cannot be blank", fieldsStr)
 }
 
 ///////////////////
@@ -112,32 +112,29 @@ func DatabaseQueryNotPreparedErrorMessage(query string) string {
 	return fmt.Sprintf("prepared statement '%s' not found", query)
 }
 
-// From
 func DatabaseQueryErrorMessage(entity, action string, err error) string {
 	return fmt.Sprintf("error %s %s: %v", action, entity, err)
 }
 
 func DatabaseResourceNotFoundErrorMessage(entity string) string {
-	return fmt.Sprintf("%s not found.", entity)
+	return fmt.Sprintf("%s not found", entity)
 }
-
-// To
 
 ///////////////////
 // Service       //
 ///////////////////
 func ServicesNotModifiedErrorMessage() string {
-	return "Nothing to update."
+	return "Nothing to update"
 }
 
 func ServicesUniqueValidationErrorMessage(field string) string {
-	return fmt.Sprintf("%s is already taken.", field)
+	return fmt.Sprintf("%s is already taken", field)
 }
 
 func ServicesResourceNotFoundErrorMessage(resource string) string {
-	return fmt.Sprintf("%s not found.", resource)
+	return fmt.Sprintf("%s not found", resource)
 }
 
 func ServicesInvalidCredentialsErrorMessage() string {
-	return "Invalid credentials."
+	return "Invalid credentials"
 }

@@ -18,7 +18,7 @@ func New(logger *logrus.Logger) *Cloudflare {
 
 	r2Resolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
-			URL: fmt.Sprintf("https://%s.r2.cloudflareDatabase.com", creds.CloudflareAccountID),
+			URL: fmt.Sprintf("https://%s.r2.cloudflarestorage.com", creds.CloudflareAccountID),
 		}, nil
 	})
 
