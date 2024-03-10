@@ -36,3 +36,10 @@ run:
 .PHONY: test
 test:
 	go test ./...
+
+#############
+# BUILD     #
+#############
+.PHONY: build
+build:
+	go build -o upl cmd/server/main.go
