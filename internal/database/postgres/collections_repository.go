@@ -60,6 +60,8 @@ func (r *CollectionsRepository) Create(collection *collections.Collection) error
 
 	_, err = stmt.Exec(collection.ID, collection.Name, collection.Description, collection.Secret, collection.Tag, collection.TagID, collection.UploadsQuantity, collection.MembersQuantity, collection.CreatorID, collection.DeletedBy, collection.DeletedAt)
 	if err != nil {
+		r.logger.Error(err.Error())
+
 		return &errs.DatabaseError{
 			Message: errs.DatabaseQueryErrorMessage("collection", "creating", err),
 		}
@@ -76,6 +78,8 @@ func (r *CollectionsRepository) FindByName(name string) (collections.Collection,
 
 	var collection collections.Collection
 	if err = stmt.Get(&collection, name); err != nil {
+		r.logger.Error(err.Error())
+
 		return collections.Collection{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
 		}
@@ -92,6 +96,8 @@ func (r *CollectionsRepository) FindByID(id string) (collections.Collection, err
 
 	var collection collections.Collection
 	if err = stmt.Get(&collection, id); err != nil {
+		r.logger.Error(err.Error())
+
 		return collections.Collection{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
 		}
@@ -120,6 +126,8 @@ func (r *CollectionsRepository) Save(collections *collections.Collection) error 
 	)
 
 	if err != nil {
+		r.logger.Error(err.Error())
+
 		return &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection"),
 		}

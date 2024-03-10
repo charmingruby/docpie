@@ -1,8 +1,6 @@
 package postgres
 
 import (
-	"fmt"
-
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
@@ -12,6 +10,7 @@ import (
 type AccountsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
+	logger     *logrus.Logger
 }
 
 func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsRepository, error) {
@@ -38,6 +37,7 @@ func NewAccountsRepository(logger *logrus.Logger, db *sqlx.DB) (*AccountsReposit
 	return &AccountsRepository{
 		DB:         db,
 		statements: sqlStmts,
+		logger:     logger,
 	}, nil
 }
 
@@ -60,7 +60,11 @@ func (r *AccountsRepository) Create(account *accounts.Account) error {
 
 	_, err = stmt.Exec(account.ID, account.Name, account.LastName, account.Email, account.Role, account.Password, account.AvatarURL, account.UploadQuantity, account.CollectionsMemberQuantity, account.CollectionsCreatedQuantity)
 	if err != nil {
-		return fmt.Errorf("error %s %s: %v", "create", "account", err.Error())
+		r.logger.Error(err.Error())
+
+		return &errs.DatabaseError{
+			Message: errs.DatabaseQueryErrorMessage("account", "creating", err),
+		}
 	}
 
 	return nil
@@ -74,6 +78,8 @@ func (r *AccountsRepository) FindByEmail(email string) (accounts.Account, error)
 
 	var a accounts.Account
 	if err = stmt.Get(&a, email); err != nil {
+		r.logger.Error(err.Error())
+
 		return accounts.Account{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
 		}
@@ -90,6 +96,8 @@ func (r *AccountsRepository) FindById(id string) (accounts.Account, error) {
 
 	var a accounts.Account
 	if err := stmt.Get(&a, id); err != nil {
+		r.logger.Error(err.Error())
+
 		return accounts.Account{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
 		}
@@ -120,6 +128,8 @@ func (r *AccountsRepository) Save(account *accounts.Account) error {
 	)
 
 	if err != nil {
+		r.logger.Error(err.Error())
+
 		return &errs.DatabaseError{
 			Message: "Unable to save account",
 		}

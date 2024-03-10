@@ -61,6 +61,8 @@ func (r *CollectionMembersRepository) Create(member *collections.CollectionMembe
 
 	_, err = stmt.Exec(member.ID, member.Role, member.UploadsQuantity, member.AccountID, member.CollectionID, member.LeftAt, member.UpdatedAt)
 	if err != nil {
+		r.logger.Error(err.Error())
+
 		return &errs.DatabaseError{
 			Message: errs.DatabaseQueryErrorMessage("collection member", "creating", err),
 		}
@@ -77,6 +79,8 @@ func (r *CollectionMembersRepository) FindMemberInCollection(accountID, collecti
 
 	var member collections.CollectionMember
 	if err := stmt.Get(&member, collectionID, accountID); err != nil {
+		r.logger.Error(err.Error())
+
 		return collections.CollectionMember{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection Member"),
 		}
@@ -93,6 +97,8 @@ func (r *CollectionMembersRepository) FetchByCollectionID(collectionID string) (
 
 	var members []collections.CollectionMember
 	if err := stmt.Select(&members, collectionID); err != nil {
+		r.logger.Error(err.Error())
+
 		return nil, &errs.DatabaseError{
 			Message: err.Error(),
 		}

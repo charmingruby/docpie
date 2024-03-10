@@ -10,6 +10,7 @@ import (
 type CollectionTagsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
+	logger     *logrus.Logger
 }
 
 func NewCollectionTagsRepository(logger *logrus.Logger, db *sqlx.DB) (*CollectionTagsRepository, error) {
@@ -36,6 +37,7 @@ func NewCollectionTagsRepository(logger *logrus.Logger, db *sqlx.DB) (*Collectio
 	return &CollectionTagsRepository{
 		DB:         db,
 		statements: sqlStmts,
+		logger:     logger,
 	}, nil
 }
 
@@ -58,6 +60,8 @@ func (r *CollectionTagsRepository) Create(tag *collections.CollectionTag) error 
 
 	_, err = stmt.Exec(tag.ID, tag.Name, tag.Description)
 	if err != nil {
+		r.logger.Error(err.Error())
+
 		return &errs.DatabaseError{
 			Message: errs.DatabaseQueryErrorMessage("collection tag", "creating", err),
 		}
@@ -74,6 +78,8 @@ func (r *CollectionTagsRepository) FindByName(name string) (collections.Collecti
 
 	var tag collections.CollectionTag
 	if err = stmt.Get(&tag, name); err != nil {
+		r.logger.Error(err.Error())
+
 		return collections.CollectionTag{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection Tag"),
 		}
@@ -90,6 +96,7 @@ func (r *CollectionTagsRepository) FindByID(id string) (collections.CollectionTa
 
 	var tag collections.CollectionTag
 	if err = stmt.Get(&tag, id); err != nil {
+		r.logger.Error(err.Error())
 
 		return collections.CollectionTag{}, &errs.DatabaseError{
 			Message: errs.DatabaseResourceNotFoundErrorMessage("Collection Tag"),
