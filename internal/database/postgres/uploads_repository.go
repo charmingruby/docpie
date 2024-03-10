@@ -10,6 +10,7 @@ import (
 type UploadsRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
+	logger     *logrus.Logger
 }
 
 func NewUploadsRepository(logger *logrus.Logger, db *sqlx.DB) (*UploadsRepository, error) {
@@ -36,6 +37,7 @@ func NewUploadsRepository(logger *logrus.Logger, db *sqlx.DB) (*UploadsRepositor
 	return &UploadsRepository{
 		DB:         db,
 		statements: sqlStmts,
+		logger:     logger,
 	}, nil
 }
 
@@ -51,12 +53,12 @@ func (r *UploadsRepository) statement(queryName string) (*sqlx.Stmt, error) {
 }
 
 func (r *UploadsRepository) Create(upload *collections.Upload) error {
-	stmt, err := r.statement(createCollectionMember)
+	stmt, err := r.statement(createUpload)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec()
+	_, err = stmt.Exec(upload.ID, upload.Name, upload.Url, upload.FileSize, upload.FileMimetype, upload.CollectionID, upload.UploaderID)
 	if err != nil {
 		return &errs.DatabaseError{
 			Message: errs.DatabaseQueryErrorMessage("upload", "creating", err),

@@ -76,7 +76,7 @@ func main() {
 	collectionTagsService := collections.NewCollectionTagsService(collectionTagsRepository)
 	collectionsService := collections.NewCollectionService(collectionsRepository, collectionTagsRepository, collectionMembersRepository, accountsRepository)
 	collectionMembersService := collections.NewCollectionsMembersService(collectionMembersRepository, accountsRepository, collectionsRepository)
-	uploadsService := collections.NewUploadService(uploadsRepository, collectionsRepository, accountsRepository)
+	uploadsService := collections.NewUploadService(uploadsRepository, collectionsRepository, accountsRepository, collectionMembersRepository)
 	logger.Info("Services initialized.")
 
 	// Initialize REST server

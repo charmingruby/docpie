@@ -44,15 +44,15 @@ func (h *CollectionsHandler) Register(router *mux.Router) {
 	createUploadEndpoint := endpoints.MakeCreateUploadEndpoint(h.logger, h.uploadsService)
 
 	// Manager
-	router.HandleFunc("/collections/tags", h.mw.ProtectedRouteByRole(h.logger, "manager", createCollectionTagEndpoint)).
+	router.HandleFunc("/collections/tags", h.mw.ProtectedRouteByRole("manager", createCollectionTagEndpoint)).
 		Methods(http.MethodPost)
 
 	// Members
-	router.HandleFunc("/collections", h.mw.ProtectedRoute(h.logger, createCollectionEndpoint)).
+	router.HandleFunc("/collections", h.mw.ProtectedRoute(createCollectionEndpoint)).
 		Methods(http.MethodPost)
-	router.HandleFunc("/collections/{id}/members", createCollectionMemberEndpoint).
+	router.HandleFunc("/collections/{id}/members", h.mw.ProtectedRouterFromNonNCollectionMembers("manager", createCollectionMemberEndpoint)).
 		Methods(http.MethodPost)
-	router.HandleFunc("/collections/{id}/upload", createUploadEndpoint).
+	router.HandleFunc("/collections/{id}/uploads", h.mw.ProtectedRouterFromNonNCollectionMembers("", createUploadEndpoint)).
 		Methods(http.MethodPost)
 
 }

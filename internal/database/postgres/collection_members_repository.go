@@ -10,6 +10,7 @@ import (
 type CollectionMembersRepository struct {
 	DB         *sqlx.DB
 	statements map[string]*sqlx.Stmt
+	logger     *logrus.Logger
 }
 
 func NewCollectionMembersRepository(logger *logrus.Logger, db *sqlx.DB) (*CollectionMembersRepository, error) {
@@ -36,11 +37,13 @@ func NewCollectionMembersRepository(logger *logrus.Logger, db *sqlx.DB) (*Collec
 	return &CollectionMembersRepository{
 		DB:         db,
 		statements: sqlStmts,
+		logger:     logger,
 	}, nil
 }
 
 func (r *CollectionMembersRepository) statement(queryName string) (*sqlx.Stmt, error) {
 	stmt, ok := r.statements[queryName]
+
 	if !ok {
 		return nil, &errs.DatabaseError{
 			Message: errs.DatabaseQueryNotPreparedErrorMessage(queryName),
@@ -96,4 +99,21 @@ func (r *CollectionMembersRepository) FetchByCollectionID(collectionID string) (
 	}
 
 	return members, nil
+}
+
+func (r *CollectionMembersRepository) Save(member *collections.CollectionMember) error {
+	stmt, err := r.statement(saveCollectionMember)
+	if err != nil {
+		return err
+	}
+
+	if _, err := stmt.Exec(member.Role, member.UploadsQuantity, member.UpdatedAt, member.LeftAt, member.ID); err != nil {
+		r.logger.Error(err.Error())
+
+		return &errs.DatabaseError{
+			Message: "Unable to save member",
+		}
+	}
+
+	return nil
 }

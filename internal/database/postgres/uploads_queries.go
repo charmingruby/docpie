@@ -6,6 +6,6 @@ const (
 
 func uploadsQueries() map[string]string {
 	return map[string]string{
-		createUpload: `INSERT INTO collection_members (id, role, uploads_quantity, account_id, collection_id, left_at, updated_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+		createUpload: `INSERT INTO uploads (id, name, url, file_size, file_mimetype, collection_id, uploader_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
 	}
 }

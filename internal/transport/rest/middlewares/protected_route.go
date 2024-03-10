@@ -4,15 +4,14 @@ import (
 	"net/http"
 
 	"github.com/charmingruby/upl/pkg/token"
-	"github.com/sirupsen/logrus"
 )
 
-func (m *Middleware) ProtectedRoute(logger *logrus.Logger, next http.HandlerFunc) http.HandlerFunc {
+func (m *Middleware) ProtectedRoute(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		extractedToken := extractTokenFromRequest(r)
 
 		if isTokenValid := token.NewJwtService().ValidateToken(extractedToken); !isTokenValid {
-			logger.Error("Invalid token")
+			m.logger.Error("Invalid token")
 			sendResponse[any](w, "Unauthorized", http.StatusUnauthorized, nil)
 			return
 		}

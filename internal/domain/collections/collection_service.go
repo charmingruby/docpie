@@ -34,7 +34,7 @@ func (s *CollectionService) Create(collection *Collection) error {
 		return resourceNotFoundError
 	}
 
-	if owner.CollectionsCreatedQuantity > domain.MaxMemberAccountCreatedCollections {
+	if owner.CollectionsCreatedQuantity >= domain.MaxMemberAccountCreatedCollections {
 		return &errs.ServiceError{
 			Message: fmt.Sprintf("Members can only create %d collections", domain.MaxMemberAccountCreatedCollections),
 		}

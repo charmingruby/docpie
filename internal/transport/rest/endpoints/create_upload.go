@@ -1,9 +1,12 @@
 package endpoints
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/charmingruby/upl/internal/domain/collections"
+	"github.com/charmingruby/upl/pkg/cloudflare"
 	"github.com/charmingruby/upl/pkg/files"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/gorilla/mux"
@@ -25,7 +28,7 @@ func MakeCreateUploadEndpoint(logger *logrus.Logger, uploadService *collections.
 
 		maxUploadSize := files.MBToBytes(25)
 		validMimetypes := []string{"jpg", "png", "jpeg", "pdf", "doc", "gif"}
-		_, entity, err := handleMultipartFormFile(
+		file, entity, err := handleMultipartFormFile(
 			r,
 			"upload",
 			32,
@@ -59,7 +62,16 @@ func MakeCreateUploadEndpoint(logger *logrus.Logger, uploadService *collections.
 			return
 		}
 
-		// Cloudflare
-		// OK
+		cl := cloudflare.New(logger)
+		fileURL := fmt.Sprintf("%s-%d.%s", payload.AccountID, time.Now().Unix(), entity.Mimetype)
+		if err := cl.UploadToBucket(file, fileURL); err != nil {
+			logger.Error(err)
+			sendResponse[any](w, "Unable to upload to Cloudflare", http.StatusInternalServerError, nil)
+			return
+		}
+
+		msg := CreatedResponse("Upload")
+		logger.Info(msg)
+		sendResponse[any](w, msg, http.StatusCreated, nil)
 	}
 }

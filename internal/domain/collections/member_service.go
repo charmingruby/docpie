@@ -50,7 +50,7 @@ func (s *CollectionMembersService) CreateMember(accountID, collectionID string) 
 		return err
 	}
 
-	if collection.MembersQuantity > domain.MaxCollectionMembers {
+	if collection.MembersQuantity >= domain.MaxCollectionMembers {
 		return &errs.ServiceError{
 			Message: fmt.Sprintf("Collections can only have %d members", domain.MaxCollectionMembers),
 		}

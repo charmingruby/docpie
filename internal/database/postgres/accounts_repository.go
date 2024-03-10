@@ -121,7 +121,7 @@ func (r *AccountsRepository) Save(account *accounts.Account) error {
 
 	if err != nil {
 		return &errs.DatabaseError{
-			Message: errs.DatabaseResourceNotFoundErrorMessage("Account"),
+			Message: "Unable to save account",
 		}
 	}
 
