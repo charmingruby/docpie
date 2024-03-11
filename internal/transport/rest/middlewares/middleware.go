@@ -6,13 +6,19 @@ import (
 )
 
 type Middleware struct {
-	logger            *logrus.Logger
-	membersRepository collections.CollectionMembersRepository
+	logger                *logrus.Logger
+	membersRepository     collections.CollectionMembersRepository
+	collectionsRepository collections.CollectionsRepository
 }
 
-func NewMiddleware(logger *logrus.Logger, membersRepository collections.CollectionMembersRepository) *Middleware {
+func NewMiddleware(
+	logger *logrus.Logger,
+	membersRepository collections.CollectionMembersRepository,
+	collectionsRepository collections.CollectionsRepository,
+) *Middleware {
 	return &Middleware{
-		logger:            logger,
-		membersRepository: membersRepository,
+		logger:                logger,
+		membersRepository:     membersRepository,
+		collectionsRepository: collectionsRepository,
 	}
 }

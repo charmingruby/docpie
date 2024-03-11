@@ -82,7 +82,7 @@ func main() {
 	// Initialize REST server
 	logger.Info("Initializing HTTP server...")
 	router := mux.NewRouter().StrictSlash(true)
-	middlewares := middlewares.NewMiddleware(cfg.Logger, collectionMembersRepository)
+	middlewares := middlewares.NewMiddleware(cfg.Logger, collectionMembersRepository, collectionsRepository)
 
 	// Initialize the routes
 	logger.Info("Registering routes...")

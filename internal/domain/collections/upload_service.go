@@ -7,7 +7,7 @@ import (
 )
 
 type UploadService struct {
-	Repo            UploadsRepository
+	repo            UploadsRepository
 	collectionsRepo CollectionsRepository
 	accountsRepo    accounts.AccountRepository
 	membersRepo     CollectionMembersRepository
@@ -20,7 +20,7 @@ func NewUploadService(
 	membersRepo CollectionMembersRepository,
 ) *UploadService {
 	return &UploadService{
-		Repo:            repo,
+		repo:            repo,
 		collectionsRepo: collectionsRepo,
 		accountsRepo:    accountsRepo,
 		membersRepo:     membersRepo,
@@ -44,7 +44,13 @@ func (s *UploadService) CreateUpload(upload *Upload) error {
 		return err
 	}
 
-	if err := s.Repo.Create(upload); err != nil {
+	if err := s.repo.Create(upload); err != nil {
+		return err
+	}
+
+	collection, _ := s.collectionsRepo.FindByID(upload.CollectionID)
+	collection.UploadsQuantity += 1
+	if err := s.collectionsRepo.Save(&collection); err != nil {
 		return err
 	}
 
@@ -59,4 +65,18 @@ func (s *UploadService) CreateUpload(upload *Upload) error {
 	}
 
 	return nil
+}
+
+func (s *UploadService) FetchCollectionUploads(page int, collectionID string) ([]Upload, *Collection, error) {
+	collection, err := s.collectionsRepo.FindByID(collectionID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	uploads, err := s.repo.FetchUploadsByCollectionID(page, collectionID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return uploads, &collection, nil
 }

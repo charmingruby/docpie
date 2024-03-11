@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/domain/collections"
 	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
@@ -68,4 +69,27 @@ func (r *UploadsRepository) Create(upload *collections.Upload) error {
 	}
 
 	return nil
+}
+
+func (r *UploadsRepository) FetchUploadsByCollectionID(page int, collectionID string) ([]collections.Upload, error) {
+	stmt, err := r.statement(fetchUploadsByCollectionID)
+	if err != nil {
+		return nil, err
+	}
+
+	var uploads []collections.Upload
+
+	offset := page * core.MemberPerPage()
+	limit := core.MemberPerPage()
+
+	if err := stmt.Select(&uploads, collectionID, limit, offset); err != nil {
+		r.logger.Error(err.Error())
+
+		return nil, &errs.DatabaseError{
+			Message: err.Error(),
+		}
+	}
+
+	return uploads, nil
+
 }

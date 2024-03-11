@@ -43,6 +43,7 @@ func (h *CollectionsHandler) Register(router *mux.Router) {
 	createCollectionMemberEndpoint := endpoints.MakeAddMemberToACollectionEndpoint(h.logger, h.membersService)
 	createUploadEndpoint := endpoints.MakeCreateUploadEndpoint(h.logger, h.uploadsService)
 	fetchMembersEndpoint := endpoints.MakeFetchCollectionMembersEndpoint(h.logger, h.membersService)
+	fetchUploadsEndpoint := endpoints.MakeFetchCollectionUploadsEndpoints(h.logger, h.uploadsService)
 
 	// Manager
 	router.HandleFunc("/collections/tags", h.mw.ProtectedRouteByRole("manager", createCollectionTagEndpoint)).
@@ -51,6 +52,8 @@ func (h *CollectionsHandler) Register(router *mux.Router) {
 	// Members
 	router.HandleFunc("/collections", h.mw.ProtectedRoute(createCollectionEndpoint)).
 		Methods(http.MethodPost)
+	router.HandleFunc("/collections/{id}/uploads", h.mw.ProtectedRouterFromNonNCollectionMembers("", fetchUploadsEndpoint)).
+		Methods(http.MethodGet)
 	router.HandleFunc("/collections/{id}/members", h.mw.ProtectedRouterFromNonNCollectionMembers("", fetchMembersEndpoint)).
 		Methods(http.MethodGet)
 	router.HandleFunc("/collections/{id}/members", h.mw.ProtectedRouterFromNonNCollectionMembers("manager", createCollectionMemberEndpoint)).

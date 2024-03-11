@@ -12,16 +12,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type FetchCollectionMembersResponse struct {
-	Page           int                            `json:"page"`
-	TotalMembers   int                            `json:"total_members"`
-	MembersFetched int                            `json:"members_fetched"`
-	Members        []collections.CollectionMember `json:"members"`
+type FetchCollectionUploadsResponse struct {
+	Page           int                  `json:"page"`
+	TotalUploads   int                  `json:"total_uploads"`
+	UploadsFetched int                  `json:"uploads_fetched"`
+	Uploads        []collections.Upload `json:"uploads"`
 }
 
-func MakeFetchCollectionMembersEndpoint(
+func MakeFetchCollectionUploadsEndpoints(
 	logger *logrus.Logger,
-	membersService *collections.CollectionMembersService,
+	uploadsService *collections.UploadService,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -34,7 +34,7 @@ func MakeFetchCollectionMembersEndpoint(
 			sendResponse[any](w, fmt.Sprintf("Invalid page param: %s", err.Error()), http.StatusBadRequest, nil)
 		}
 
-		members, collection, err := membersService.FetchCollectionMembers(page, collectionID)
+		uploads, collection, err := uploadsService.FetchCollectionUploads(page, collectionID)
 		if err != nil {
 			isResourceNotFoundError := errors.Is(err, &errs.DatabaseError{})
 			if isResourceNotFoundError {
@@ -46,13 +46,13 @@ func MakeFetchCollectionMembersEndpoint(
 			return
 		}
 
-		res := &FetchCollectionMembersResponse{
+		res := &FetchCollectionUploadsResponse{
 			Page:           page + 1,
-			TotalMembers:   int(collection.MembersQuantity),
-			MembersFetched: len(members),
-			Members:        members,
+			TotalUploads:   int(collection.MembersQuantity),
+			UploadsFetched: len(uploads),
+			Uploads:        uploads,
 		}
-		msg := fmt.Sprintf("Fetched %d of %d members on page %d", res.MembersFetched, res.TotalMembers, res.Page)
-		sendResponse[FetchCollectionMembersResponse](w, msg, http.StatusOK, res)
+		msg := fmt.Sprintf("Fetched %d of %d uploads on page %d", res.UploadsFetched, res.TotalUploads, res.Page)
+		sendResponse[FetchCollectionUploadsResponse](w, msg, http.StatusOK, res)
 	}
 }

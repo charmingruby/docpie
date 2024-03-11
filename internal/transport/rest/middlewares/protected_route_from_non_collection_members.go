@@ -30,6 +30,12 @@ func (m *Middleware) ProtectedRouterFromNonNCollectionMembers(
 			return
 		}
 
+		if _, err := m.collectionsRepository.FindByID(collectionID); err != nil {
+			m.logger.Error("Collection not found")
+			sendResponse[any](w, "Collection not found", http.StatusNotFound, nil)
+			return
+		}
+
 		member, err := m.membersRepository.FindMemberInCollection(payload.AccountID, collectionID)
 		if err != nil {
 			m.logger.Error("Member not in collection")

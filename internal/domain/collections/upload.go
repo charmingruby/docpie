@@ -33,15 +33,15 @@ func NewUpload(collectionID, uploaderID string, file *files.File) (*Upload, erro
 }
 
 type Upload struct {
-	ID           string     `json:"id"`
-	Name         string     `json:"name"`
-	Url          string     `json:"url"`
-	FileSize     int64      `json:"file_size"`
-	FileMimetype string     `json:"file_mimetype"`
-	CollectionID string     `json:"collection_id"`
-	UploaderID   string     `json:"uploader_id"`
-	UploadedAt   time.Time  `json:"uploaded_at"`
-	DeletedAt    *time.Time `json:"deleted_at"`
+	ID           string     `db:"id" json:"id"`
+	Name         string     `db:"name" json:"name"`
+	Url          string     `db:"url" json:"url"`
+	FileSize     int64      `db:"file_size" json:"file_size"`
+	FileMimetype string     `db:"file_mimetype" json:"file_mimetype"`
+	CollectionID string     `db:"collection_id" json:"collection_id"`
+	UploaderID   string     `db:"uploader_id" json:"uploader_id"`
+	UploadedAt   time.Time  `db:"uploaded_at" json:"uploaded_at"`
+	DeletedAt    *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 func (u *Upload) Validate() error {
