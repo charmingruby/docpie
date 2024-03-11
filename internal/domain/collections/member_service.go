@@ -82,3 +82,17 @@ func (s *CollectionMembersService) CreateMember(accountID, collectionID string) 
 
 	return nil
 }
+
+func (s *CollectionMembersService) FetchCollectionMembers(page int, collectionID string) ([]CollectionMember, *Collection, error) {
+	collection, err := s.collectionsRepo.FindByID(collectionID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	members, err := s.repo.FetchByCollectionID(page, collectionID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return members, &collection, nil
+}

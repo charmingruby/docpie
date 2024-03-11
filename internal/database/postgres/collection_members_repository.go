@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"github.com/charmingruby/upl/internal/core"
 	"github.com/charmingruby/upl/internal/domain/collections"
 	"github.com/charmingruby/upl/internal/validation/errs"
 	"github.com/jmoiron/sqlx"
@@ -89,14 +90,18 @@ func (r *CollectionMembersRepository) FindMemberInCollection(accountID, collecti
 	return member, nil
 }
 
-func (r *CollectionMembersRepository) FetchByCollectionID(collectionID string) ([]collections.CollectionMember, error) {
+func (r *CollectionMembersRepository) FetchByCollectionID(page int, collectionID string) ([]collections.CollectionMember, error) {
 	stmt, err := r.statement(fetchMembersByCollectionID)
 	if err != nil {
 		return nil, err
 	}
 
 	var members []collections.CollectionMember
-	if err := stmt.Select(&members, collectionID); err != nil {
+
+	offset := page * core.MemberPerPage()
+	limit := core.MemberPerPage()
+
+	if err := stmt.Select(&members, collectionID, limit, offset); err != nil {
 		r.logger.Error(err.Error())
 
 		return nil, &errs.DatabaseError{
