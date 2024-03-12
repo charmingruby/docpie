@@ -1,4 +1,4 @@
-package cloudflare
+package storage
 
 import (
 	"context"

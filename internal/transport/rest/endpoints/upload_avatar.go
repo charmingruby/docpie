@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/charmingruby/upl/internal/domain/accounts"
+	"github.com/charmingruby/upl/internal/storage"
 	"github.com/charmingruby/upl/internal/validation/errs"
-	"github.com/charmingruby/upl/pkg/cloudflare"
 	"github.com/charmingruby/upl/pkg/files"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/sirupsen/logrus"
@@ -40,7 +40,7 @@ func MakeUploadAvatar(logger *logrus.Logger, accountsService *accounts.AccountSe
 		fileURL := fmt.Sprintf("%s-%d.%s", payload.AccountID, time.Now().Unix(), entity.Mimetype)
 
 		// Register file on Bucket
-		cl := cloudflare.New(logger)
+		cl := storage.New(logger)
 		if err = cl.UploadToBucket(file, fileURL); err != nil {
 			logger.Error(err)
 			sendResponse[any](w, "Unable to update avatar on Cloudflare", http.StatusInternalServerError, nil)

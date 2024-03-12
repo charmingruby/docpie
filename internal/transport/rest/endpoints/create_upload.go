@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/charmingruby/upl/internal/domain/collections"
-	"github.com/charmingruby/upl/pkg/cloudflare"
+	"github.com/charmingruby/upl/internal/storage"
 	"github.com/charmingruby/upl/pkg/files"
 	"github.com/charmingruby/upl/pkg/token"
 	"github.com/gorilla/mux"
@@ -62,11 +62,11 @@ func MakeCreateUploadEndpoint(logger *logrus.Logger, uploadService *collections.
 			return
 		}
 
-		cl := cloudflare.New(logger)
+		cl := storage.New(logger)
 		fileURL := fmt.Sprintf("%s-%d.%s", payload.AccountID, time.Now().Unix(), entity.Mimetype)
 		if err := cl.UploadToBucket(file, fileURL); err != nil {
 			logger.Error(err)
-			sendResponse[any](w, "Unable to upload to Cloudflare", http.StatusInternalServerError, nil)
+			sendResponse[any](w, "Unable to upload to storage", http.StatusInternalServerError, nil)
 			return
 		}
 

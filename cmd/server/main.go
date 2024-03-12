@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/charmingruby/upl/config"
+	"github.com/charmingruby/upl/internal/config"
 	"github.com/charmingruby/upl/internal/database/postgres"
 	"github.com/charmingruby/upl/internal/domain/accounts"
 	"github.com/charmingruby/upl/internal/domain/collections"
@@ -23,47 +23,46 @@ func main() {
 		logger.Info(".env file not found")
 	}
 
-	cfg, err := config.LoadConfig(logger)
+	cfg, err := config.New(logger)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-	cfg.AssignLogger(logger)
 
-	db, err := postgresql.LoadDatabase(cfg)
+	db, err := postgresql.New(cfg)
 	if err != nil {
 		logger.Errorf("Error connecting to postgres: %s", err.Error())
 		os.Exit(1)
 	}
-	cfg.AssignDatabaseConn(db)
+	cfg.SetDatabaseConn(db)
 
 	// Initialize repos
 	logger.Info("Initializing repositories...")
-	accountsRepository, err := postgres.NewAccountsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	accountsRepository, err := postgres.NewAccountsRepository(cfg.Logger, cfg.Database.Conn)
 	if err != nil {
 		logger.Errorf("Error initializing accounts postgres repository: %s", err.Error())
 		os.Exit(1)
 	}
 
-	collectionTagsRepository, err := postgres.NewCollectionTagsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	collectionTagsRepository, err := postgres.NewCollectionTagsRepository(cfg.Logger, cfg.Database.Conn)
 	if err != nil {
 		logger.Errorf("Error initializing collection tags postgres repository: %s", err.Error())
 		os.Exit(1)
 	}
 
-	collectionsRepository, err := postgres.NewCollectionsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	collectionsRepository, err := postgres.NewCollectionsRepository(cfg.Logger, cfg.Database.Conn)
 	if err != nil {
 		logger.Errorf("Error initializing collections postgres repository: %s", err.Error())
 		os.Exit(1)
 	}
 
-	collectionMembersRepository, err := postgres.NewCollectionMembersRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	collectionMembersRepository, err := postgres.NewCollectionMembersRepository(cfg.Logger, cfg.Database.Conn)
 	if err != nil {
 		logger.Errorf("Error initializing collection members postgres repository: %s", err.Error())
 		os.Exit(1)
 	}
 
-	uploadsRepository, err := postgres.NewUploadsRepository(cfg.Logger, cfg.Database.DatabaseConn)
+	uploadsRepository, err := postgres.NewUploadsRepository(cfg.Logger, cfg.Database.Conn)
 	if err != nil {
 		logger.Errorf("Error initializing uploads postgres repository: %s", err.Error())
 		os.Exit(1)
